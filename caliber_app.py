@@ -410,21 +410,33 @@ if st.session_state.page == max_page:
             import streamlit as st
             from gspread_dataframe import get_as_dataframe
 
-            # Authenticate with service account
+            from google.oauth2 import service_account
+            import gspread
+
+            SCOPES = [
+                "https://www.googleapis.com/auth/spreadsheets",
+                "https://www.googleapis.com/auth/drive"
+            ]
+
             credentials = service_account.Credentials.from_service_account_info(
-                st.secrets["gdrive"],  # assuming you stored credentials in Streamlit secrets
-                scopes=["https://www.googleapis.com/auth/spreadsheets"]
+                st.secrets["gdrive"],  # or use from_service_account_file() if loading from file
+                scopes=SCOPES
             )
 
             gc = gspread.authorize(credentials)
+
 
             # available_sheets = gc.openall()
             # for sheet in available_sheets:
             #     st.write("Found sheet:", sheet.title)
 
             # Open the spreadsheet and worksheet
-            spreadsheet = gc.open("CALIBER_Survey_Responses")  # Replace with your actual sheet name
-            sheet = spreadsheet.worksheet("Sheet1")  # Replace with your actual tab name
+            # spreadsheet = gc.open("CALIBER_Survey_Responses")  # Replace with your actual sheet name
+            # sheet = spreadsheet.worksheet("Sheet1")  # Replace with your actual tab name
+            # This is safer than using .open() with title
+            spreadsheet = gc.open_by_key("1wkiNqNpaONIRnAdyilEa4AIETEvnlNf1sWCrABUlxsk")  # Replace with actual Sheet ID
+            worksheet = spreadsheet.worksheet("Sheet1")
+
 
             # Get existing data
             existing_df = get_as_dataframe(sheet)
