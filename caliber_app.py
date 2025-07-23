@@ -1302,8 +1302,8 @@ Your leadership journey is uniquely yours — and it doesn’t stop here.
                     mime="application/pdf"
                 )
 
-            csv_drive_id = upload_to_drive(filename, filename, "text/csv", folder_id)
-            pdf_drive_id = upload_to_drive(pdf_filename, pdf_filename, "application/pdf", "your-folder-id")
+            # csv_drive_id = upload_to_drive(filename, filename, "text/csv", folder_id)
+            # pdf_drive_id = upload_to_drive(pdf_filename, pdf_filename, "application/pdf", "your-folder-id")
 
             # pdf_id = upload_to_drive(pdf_filename, pdf_filename, "application/pdf", folder_id)
             # if pdf_id:
