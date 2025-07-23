@@ -435,11 +435,10 @@ if st.session_state.page == max_page:
             # sheet = spreadsheet.worksheet("Sheet1")  # Replace with your actual tab name
             # This is safer than using .open() with title
             spreadsheet = gc.open_by_key("1wkiNqNpaONIRnAdyilEa4AIETEvnlNf1sWCrABUlxsk")  # Replace with actual Sheet ID
-            worksheet = spreadsheet.worksheet("Sheet1")
-
-
-            # Get existing data
+            # worksheet = spreadsheet.worksheet("Sheet1")
+            sheet = spreadsheet.worksheet("Sheet1")  # Replace "Sheet1" with your actual sheet name
             existing_df = get_as_dataframe(sheet)
+
 
             # Combine
             combined_df = pd.concat([existing_df, df], ignore_index=True)
