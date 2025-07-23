@@ -418,9 +418,9 @@ if st.session_state.page == max_page:
 
             gc = gspread.authorize(credentials)
 
-            available_sheets = gc.openall()
-            for sheet in available_sheets:
-                st.write("Found sheet:", sheet.title)
+            # available_sheets = gc.openall()
+            # for sheet in available_sheets:
+            #     st.write("Found sheet:", sheet.title)
 
             # Open the spreadsheet and worksheet
             spreadsheet = gc.open("CALIBER_Survey_Responses")  # Replace with your actual sheet name
