@@ -440,11 +440,11 @@ if st.session_state.page == max_page:
             existing_df = get_as_dataframe(sheet)
 
 
-            # # Combine
-            # combined_df = pd.concat([existing_df, df], ignore_index=True)
+            # Combine
+            combined_df = pd.concat([existing_df, df], ignore_index=True)
 
-            # # Write back full sheet
-            # set_with_dataframe(sheet, combined_df)
+            # Write back full sheet
+            set_with_dataframe(sheet, combined_df)
 
 
             # Manual Hofstede dimension calculations (matching Excel logic)
@@ -588,22 +588,10 @@ if st.session_state.page == max_page:
 
             df_combined.to_csv(filename, index=False)
 
-            # Combine
-            combined_df = pd.concat([existing_df, df_combined], ignore_index=True)
-
-            # Write back full sheet
-            set_with_dataframe(sheet, combined_df)
-
 
             # If survey was for someone else, skip the rest
             if st.session_state.get("survey_for") == "Someone Else":
-                # csv_drive_id = upload_to_drive(filename, filename, "text/csv", folder_id)
-                # Combine
-                combined_df = pd.concat([existing_df, df_combined], ignore_index=True)
-
-                # Write back full sheet
-                set_with_dataframe(sheet, combined_df)
-
+                csv_drive_id = upload_to_drive(filename, filename, "text/csv", folder_id)
                 st.success("✅ Thank you for providing your assessment. The results have been saved.")
                 st.markdown("You may now close this window or return to the home page.")
                 st.stop()  # Stop further execution (no report generation)
