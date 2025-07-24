@@ -394,222 +394,222 @@ if st.session_state.page == max_page:
     st.write("Please review your answers. When you're ready, click below to submit and download your results.")
 
     if st.button("Submit Survey"):
-        # with st.spinner("Creating your personalized leadership report..."):
-        df = pd.DataFrame({
-            "Question Number": [item[0] for item in item_metadata],
-            "Leadership Dimension": [item[1] for item in item_metadata],
-            "Hofstede Dimension": [item[2] for item in item_metadata],
-            "Statement": [item[3] for item in item_metadata],
-            "Response": st.session_state.responses
-        })
+        with st.spinner("Creating your personalized leadership report..."):
+            df = pd.DataFrame({
+                "Question Number": [item[0] for item in item_metadata],
+                "Leadership Dimension": [item[1] for item in item_metadata],
+                "Hofstede Dimension": [item[2] for item in item_metadata],
+                "Statement": [item[3] for item in item_metadata],
+                "Response": st.session_state.responses
+            })
 
-        from gspread_dataframe import get_as_dataframe, set_with_dataframe
+            from gspread_dataframe import get_as_dataframe, set_with_dataframe
 
-        import gspread
-        from google.oauth2 import service_account
-        import streamlit as st
-        from gspread_dataframe import get_as_dataframe
+            import gspread
+            from google.oauth2 import service_account
+            import streamlit as st
+            from gspread_dataframe import get_as_dataframe
 
-        from google.oauth2 import service_account
-        import gspread
+            from google.oauth2 import service_account
+            import gspread
 
-        SCOPES = [
-            "https://www.googleapis.com/auth/spreadsheets",
-            "https://www.googleapis.com/auth/drive"
-        ]
-
-        credentials = service_account.Credentials.from_service_account_info(
-            st.secrets["gdrive"],  # or use from_service_account_file() if loading from file
-            scopes=SCOPES
-        )
-
-        gc = gspread.authorize(credentials)
-
-
-        # available_sheets = gc.openall()
-        # for sheet in available_sheets:
-        #     st.write("Found sheet:", sheet.title)
-
-        # Open the spreadsheet and worksheet
-        # spreadsheet = gc.open("CALIBER_Survey_Responses")  # Replace with your actual sheet name
-        # sheet = spreadsheet.worksheet("Sheet1")  # Replace with your actual tab name
-        # This is safer than using .open() with title
-        spreadsheet = gc.open_by_key("1wkiNqNpaONIRnAdyilEa4AIETEvnlNf1sWCrABUlxsk")  # Replace with actual Sheet ID
-        # worksheet = spreadsheet.worksheet("Sheet1")
-        sheet = spreadsheet.worksheet("Sheet1")  # Replace "Sheet1" with your actual sheet name
-        existing_df = get_as_dataframe(sheet)
-
-
-        # # Combine
-        # combined_df = pd.concat([existing_df, df], ignore_index=True)
-
-        # # Write back full sheet
-        # set_with_dataframe(sheet, combined_df)
-
-
-        # Manual Hofstede dimension calculations (matching Excel logic)
-        dimension_custom_scores = {
-            'High Uncertainty Avoidance': st.session_state.responses[0] + (5 - st.session_state.responses[1]) + (5 - st.session_state.responses[12]) + (5 - st.session_state.responses[13]),
-            'High Individualism': st.session_state.responses[2] + st.session_state.responses[6] + st.session_state.responses[9] + st.session_state.responses[15] + st.session_state.responses[17] + st.session_state.responses[22],
-            'High Power Distance': st.session_state.responses[3] + st.session_state.responses[10] + st.session_state.responses[14] + st.session_state.responses[23],
-            'Long-Term Orientation': st.session_state.responses[4] + st.session_state.responses[8] + st.session_state.responses[19] + st.session_state.responses[20] + st.session_state.responses[24],
-            'High Masculinity': st.session_state.responses[5] + st.session_state.responses[7] + st.session_state.responses[16] + st.session_state.responses[18],
-            'High Uncertainty Avoidance PCT': (st.session_state.responses[0] + (5 - st.session_state.responses[1]) + (5 - st.session_state.responses[12]) + (5 - st.session_state.responses[13])-4)/16,
-            'High Individualism PCT': (st.session_state.responses[2] + st.session_state.responses[6] + st.session_state.responses[9] + st.session_state.responses[15] + st.session_state.responses[17] + st.session_state.responses[22]-6)/24,
-            'High Power Distance PCT': (st.session_state.responses[3] + st.session_state.responses[10] + st.session_state.responses[14] + st.session_state.responses[23]-4)/16,
-            'Long-Term Orientation PCT': (st.session_state.responses[4] + st.session_state.responses[8] + st.session_state.responses[19] + st.session_state.responses[20] + st.session_state.responses[24]-5)/20,
-            'High Masculinity PCT': (st.session_state.responses[5] + st.session_state.responses[7] + st.session_state.responses[16] + st.session_state.responses[18]-4)/16,
-            'Reinforcement': st.session_state.responses[0]+st.session_state.responses[12]+st.session_state.responses[21],
-            'Vision': st.session_state.responses[1]+st.session_state.responses[11]+st.session_state.responses[20],
-            'Communication':st.session_state.responses[2]+st.session_state.responses[14],
-            'Authenticity':st.session_state.responses[7]+st.session_state.responses[17]+st.session_state.responses[24],
-            'Competence':st.session_state.responses[8]+st.session_state.responses[18],
-            'Confidence':st.session_state.responses[5]+st.session_state.responses[16]+st.session_state.responses[23],
-            'Creativity':st.session_state.responses[6]+st.session_state.responses[13],
-            'Culture':st.session_state.responses[9]+st.session_state.responses[19]+st.session_state.responses[22],
-            'Empowerment':st.session_state.responses[3]+st.session_state.responses[10],
-            'Stewardship':st.session_state.responses[4]+st.session_state.responses[15],
-            'Reinforcement PCT': (st.session_state.responses[0]+st.session_state.responses[12]+st.session_state.responses[21]-3)/(3*4),
-            'Vision PCT': (st.session_state.responses[1]+st.session_state.responses[11]+st.session_state.responses[20]-3)/(3*4),
-            'Communication PCT':(st.session_state.responses[2]+st.session_state.responses[14]-2)/(2*4),
-            'Authenticity PCT':(st.session_state.responses[7]+st.session_state.responses[17]+st.session_state.responses[24]-3)/(3*4),
-            'Competence PCT':(st.session_state.responses[8]+st.session_state.responses[18]-2)/(2*4),
-            'Confidence PCT':(st.session_state.responses[5]+st.session_state.responses[16]+st.session_state.responses[23]-3)/(3*4),
-            'Creativity PCT':(st.session_state.responses[6]+st.session_state.responses[13]-2)/(2*4),
-            'Culture PCT':(st.session_state.responses[9]+st.session_state.responses[19]+st.session_state.responses[22]-3)/(3*4),
-            'Empowerment PCT':(st.session_state.responses[3]+st.session_state.responses[10]-2)/(2*4),
-            'Stewardship PCT':(st.session_state.responses[4]+st.session_state.responses[15]-2)/(2*4)
-        }
-
-        
-        # Extract user Hofstede cultural profile
-        user_profile = {
-            'Uncertainty Avoidance': dimension_custom_scores['High Uncertainty Avoidance PCT'] * 100,
-            'Individualism': dimension_custom_scores['High Individualism PCT'] * 100,
-            'Power Distance': dimension_custom_scores['High Power Distance PCT'] * 100,
-            'Masculinity': dimension_custom_scores['High Masculinity PCT'] * 100
-        }
-
-        from scipy.spatial.distance import euclidean
-
-        # Compute Euclidean distance from each country in the dataset
-        def compute_distance(row):
-            return euclidean([
-                row['Uncertainty Avoidance'],
-                row['Individualism'],
-                row['Power Distance'],
-                row['Masculinity']
-            ], list(user_profile.values()))
-
-        culture_df['Distance'] = culture_df.apply(compute_distance, axis=1)
-        closest_cultures = culture_df.nsmallest(5, 'Distance')['Country'].tolist()
-
-
-        leadership_custom_scores = {
-                        'Innovation PCT': (dimension_custom_scores['Communication PCT'] + dimension_custom_scores['Vision PCT'] + dimension_custom_scores['Authenticity PCT'] + dimension_custom_scores['Empowerment PCT'] + dimension_custom_scores['Creativity PCT'])/5,
-                        'Operations PCT': (dimension_custom_scores['Stewardship PCT'] + dimension_custom_scores['Competence PCT'] + dimension_custom_scores['Confidence PCT'] + dimension_custom_scores['Reinforcement PCT'] + dimension_custom_scores['Culture PCT'])/5,
-                        'Overall Leadership PCT': (dimension_custom_scores['Communication PCT'] + dimension_custom_scores['Vision PCT'] + dimension_custom_scores['Authenticity PCT'] + dimension_custom_scores['Empowerment PCT'] + dimension_custom_scores['Creativity PCT'] + dimension_custom_scores['Stewardship PCT'] + dimension_custom_scores['Competence PCT'] + dimension_custom_scores['Confidence PCT'] + dimension_custom_scores['Reinforcement PCT'] + dimension_custom_scores['Culture PCT'])/10
-                    }
-
-
-        # Convert to a DataFrame (transposed to get dimensions as rows)
-        dimension_df = pd.DataFrame(list(dimension_custom_scores.items()), columns=['Dimension', 'Score'])
-
-        # Convert to a DataFrame (transposed to get dimensions as rows)
-        leadership_df = pd.DataFrame(list(leadership_custom_scores.items()), columns=['Dimension', 'Score'])
-        
-        # Optional: add a blank row for separation
-        blank_row = pd.DataFrame([['', '']], columns=['Dimension', 'Score'])
-
-        def get_country(field_name):
-            val = st.session_state.get(field_name, "").strip()
-            return val if val else "United States"
-        
-        def get_email(field_name):
-            val = st.session_state.get(field_name, "").strip()
-            return val if val else "Unknown"
-
-        # Prepare metadata (demographics)
-        meta_info = pd.DataFrame({
-            'Field': [
-                'Name',
-                'Email',
-                'Job Function',
-                'Industry',
-                'Country of Work',
-                'Country of Birth',
-                'Survey Taken For',
-                'Subject Name',
-                'Relationship'
-            ],
-            'Value': [
-                st.session_state.get("name", ""),
-                # st.session_state.get("email", ""),
-                get_email("email"),
-                st.session_state.get("job_function", ""),
-                st.session_state.get("industry", ""),
-                # st.session_state.get("country_work", ""),
-                # st.session_state.get("birth_country", ""),
-                get_country("country_work"),
-                get_country("birth_country"),
-                st.session_state.get("survey_for", ""),
-                st.session_state.get("subject_name", "") if st.session_state.get("survey_for") == "Someone Else" else "",
-                st.session_state.get("relationship", "") if st.session_state.get("survey_for") == "Someone Else" else ""
+            SCOPES = [
+                "https://www.googleapis.com/auth/spreadsheets",
+                "https://www.googleapis.com/auth/drive"
             ]
-        })
 
-        # Optional spacing row
-        blank_row = pd.DataFrame([['', '']], columns=['Field', 'Value'])
+            credentials = service_account.Credentials.from_service_account_info(
+                st.secrets["gdrive"],  # or use from_service_account_file() if loading from file
+                scopes=SCOPES
+            )
 
-        # Combine metadata + survey results
-        meta_and_scores = pd.concat([meta_info, blank_row], ignore_index=True)
-
-        # Combine original df with new section
-        df_combined = pd.concat([df, blank_row, dimension_df, blank_row, leadership_df, blank_row, meta_and_scores], ignore_index=True)
-
-        # st.write("Work country selected 3:", country_work)
-        # st.write("Birth country selected 3:", birth_country)
+            gc = gspread.authorize(credentials)
 
 
-        # Clean name for filename
-        # Collect contextual inputs
-        participant_role = st.session_state.get("job_function", "a professional")
-        participant_industry = st.session_state.get("industry", "their industry")
-        # country_work = st.session_state.get("country_work", "their country of work")
-        # birth_country = st.session_state.get("birth_country", "their country of origin")
-        country_work = get_country("country_work"),
-        birth_country = get_country("birth_country"),
-        email = get_email("email")
+            # available_sheets = gc.openall()
+            # for sheet in available_sheets:
+            #     st.write("Found sheet:", sheet.title)
 
-        participant_name = st.session_state.get("name", "anonymous")
-        clean_name = re.sub(r'\W+', '_', participant_name.strip())
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"caliber_survey_{clean_name}_{timestamp}.csv"
-
-        df_combined.to_csv(filename, index=False)
-
-        # Combine
-        combined_df = pd.concat([existing_df, df_combined], ignore_index=True)
-
-        # Write back full sheet
-        set_with_dataframe(sheet, combined_df)
+            # Open the spreadsheet and worksheet
+            # spreadsheet = gc.open("CALIBER_Survey_Responses")  # Replace with your actual sheet name
+            # sheet = spreadsheet.worksheet("Sheet1")  # Replace with your actual tab name
+            # This is safer than using .open() with title
+            spreadsheet = gc.open_by_key("1wkiNqNpaONIRnAdyilEa4AIETEvnlNf1sWCrABUlxsk")  # Replace with actual Sheet ID
+            # worksheet = spreadsheet.worksheet("Sheet1")
+            sheet = spreadsheet.worksheet("Sheet1")  # Replace "Sheet1" with your actual sheet name
+            existing_df = get_as_dataframe(sheet)
 
 
-        # If survey was for someone else, skip the rest
-        if st.session_state.get("survey_for") == "Someone Else":
-            # csv_drive_id = upload_to_drive(filename, filename, "text/csv", folder_id)
+            # # Combine
+            # combined_df = pd.concat([existing_df, df], ignore_index=True)
+
+            # # Write back full sheet
+            # set_with_dataframe(sheet, combined_df)
+
+
+            # Manual Hofstede dimension calculations (matching Excel logic)
+            dimension_custom_scores = {
+                'High Uncertainty Avoidance': st.session_state.responses[0] + (5 - st.session_state.responses[1]) + (5 - st.session_state.responses[12]) + (5 - st.session_state.responses[13]),
+                'High Individualism': st.session_state.responses[2] + st.session_state.responses[6] + st.session_state.responses[9] + st.session_state.responses[15] + st.session_state.responses[17] + st.session_state.responses[22],
+                'High Power Distance': st.session_state.responses[3] + st.session_state.responses[10] + st.session_state.responses[14] + st.session_state.responses[23],
+                'Long-Term Orientation': st.session_state.responses[4] + st.session_state.responses[8] + st.session_state.responses[19] + st.session_state.responses[20] + st.session_state.responses[24],
+                'High Masculinity': st.session_state.responses[5] + st.session_state.responses[7] + st.session_state.responses[16] + st.session_state.responses[18],
+                'High Uncertainty Avoidance PCT': (st.session_state.responses[0] + (5 - st.session_state.responses[1]) + (5 - st.session_state.responses[12]) + (5 - st.session_state.responses[13])-4)/16,
+                'High Individualism PCT': (st.session_state.responses[2] + st.session_state.responses[6] + st.session_state.responses[9] + st.session_state.responses[15] + st.session_state.responses[17] + st.session_state.responses[22]-6)/24,
+                'High Power Distance PCT': (st.session_state.responses[3] + st.session_state.responses[10] + st.session_state.responses[14] + st.session_state.responses[23]-4)/16,
+                'Long-Term Orientation PCT': (st.session_state.responses[4] + st.session_state.responses[8] + st.session_state.responses[19] + st.session_state.responses[20] + st.session_state.responses[24]-5)/20,
+                'High Masculinity PCT': (st.session_state.responses[5] + st.session_state.responses[7] + st.session_state.responses[16] + st.session_state.responses[18]-4)/16,
+                'Reinforcement': st.session_state.responses[0]+st.session_state.responses[12]+st.session_state.responses[21],
+                'Vision': st.session_state.responses[1]+st.session_state.responses[11]+st.session_state.responses[20],
+                'Communication':st.session_state.responses[2]+st.session_state.responses[14],
+                'Authenticity':st.session_state.responses[7]+st.session_state.responses[17]+st.session_state.responses[24],
+                'Competence':st.session_state.responses[8]+st.session_state.responses[18],
+                'Confidence':st.session_state.responses[5]+st.session_state.responses[16]+st.session_state.responses[23],
+                'Creativity':st.session_state.responses[6]+st.session_state.responses[13],
+                'Culture':st.session_state.responses[9]+st.session_state.responses[19]+st.session_state.responses[22],
+                'Empowerment':st.session_state.responses[3]+st.session_state.responses[10],
+                'Stewardship':st.session_state.responses[4]+st.session_state.responses[15],
+                'Reinforcement PCT': (st.session_state.responses[0]+st.session_state.responses[12]+st.session_state.responses[21]-3)/(3*4),
+                'Vision PCT': (st.session_state.responses[1]+st.session_state.responses[11]+st.session_state.responses[20]-3)/(3*4),
+                'Communication PCT':(st.session_state.responses[2]+st.session_state.responses[14]-2)/(2*4),
+                'Authenticity PCT':(st.session_state.responses[7]+st.session_state.responses[17]+st.session_state.responses[24]-3)/(3*4),
+                'Competence PCT':(st.session_state.responses[8]+st.session_state.responses[18]-2)/(2*4),
+                'Confidence PCT':(st.session_state.responses[5]+st.session_state.responses[16]+st.session_state.responses[23]-3)/(3*4),
+                'Creativity PCT':(st.session_state.responses[6]+st.session_state.responses[13]-2)/(2*4),
+                'Culture PCT':(st.session_state.responses[9]+st.session_state.responses[19]+st.session_state.responses[22]-3)/(3*4),
+                'Empowerment PCT':(st.session_state.responses[3]+st.session_state.responses[10]-2)/(2*4),
+                'Stewardship PCT':(st.session_state.responses[4]+st.session_state.responses[15]-2)/(2*4)
+            }
+
+            
+            # Extract user Hofstede cultural profile
+            user_profile = {
+                'Uncertainty Avoidance': dimension_custom_scores['High Uncertainty Avoidance PCT'] * 100,
+                'Individualism': dimension_custom_scores['High Individualism PCT'] * 100,
+                'Power Distance': dimension_custom_scores['High Power Distance PCT'] * 100,
+                'Masculinity': dimension_custom_scores['High Masculinity PCT'] * 100
+            }
+
+            from scipy.spatial.distance import euclidean
+
+            # Compute Euclidean distance from each country in the dataset
+            def compute_distance(row):
+                return euclidean([
+                    row['Uncertainty Avoidance'],
+                    row['Individualism'],
+                    row['Power Distance'],
+                    row['Masculinity']
+                ], list(user_profile.values()))
+
+            culture_df['Distance'] = culture_df.apply(compute_distance, axis=1)
+            closest_cultures = culture_df.nsmallest(5, 'Distance')['Country'].tolist()
+
+
+            leadership_custom_scores = {
+                            'Innovation PCT': (dimension_custom_scores['Communication PCT'] + dimension_custom_scores['Vision PCT'] + dimension_custom_scores['Authenticity PCT'] + dimension_custom_scores['Empowerment PCT'] + dimension_custom_scores['Creativity PCT'])/5,
+                            'Operations PCT': (dimension_custom_scores['Stewardship PCT'] + dimension_custom_scores['Competence PCT'] + dimension_custom_scores['Confidence PCT'] + dimension_custom_scores['Reinforcement PCT'] + dimension_custom_scores['Culture PCT'])/5,
+                            'Overall Leadership PCT': (dimension_custom_scores['Communication PCT'] + dimension_custom_scores['Vision PCT'] + dimension_custom_scores['Authenticity PCT'] + dimension_custom_scores['Empowerment PCT'] + dimension_custom_scores['Creativity PCT'] + dimension_custom_scores['Stewardship PCT'] + dimension_custom_scores['Competence PCT'] + dimension_custom_scores['Confidence PCT'] + dimension_custom_scores['Reinforcement PCT'] + dimension_custom_scores['Culture PCT'])/10
+                        }
+
+
+            # Convert to a DataFrame (transposed to get dimensions as rows)
+            dimension_df = pd.DataFrame(list(dimension_custom_scores.items()), columns=['Dimension', 'Score'])
+
+            # Convert to a DataFrame (transposed to get dimensions as rows)
+            leadership_df = pd.DataFrame(list(leadership_custom_scores.items()), columns=['Dimension', 'Score'])
+            
+            # Optional: add a blank row for separation
+            blank_row = pd.DataFrame([['', '']], columns=['Dimension', 'Score'])
+
+            def get_country(field_name):
+                val = st.session_state.get(field_name, "").strip()
+                return val if val else "United States"
+            
+            def get_email(field_name):
+                val = st.session_state.get(field_name, "").strip()
+                return val if val else "Unknown"
+
+            # Prepare metadata (demographics)
+            meta_info = pd.DataFrame({
+                'Field': [
+                    'Name',
+                    'Email',
+                    'Job Function',
+                    'Industry',
+                    'Country of Work',
+                    'Country of Birth',
+                    'Survey Taken For',
+                    'Subject Name',
+                    'Relationship'
+                ],
+                'Value': [
+                    st.session_state.get("name", ""),
+                    # st.session_state.get("email", ""),
+                    get_email("email"),
+                    st.session_state.get("job_function", ""),
+                    st.session_state.get("industry", ""),
+                    # st.session_state.get("country_work", ""),
+                    # st.session_state.get("birth_country", ""),
+                    get_country("country_work"),
+                    get_country("birth_country"),
+                    st.session_state.get("survey_for", ""),
+                    st.session_state.get("subject_name", "") if st.session_state.get("survey_for") == "Someone Else" else "",
+                    st.session_state.get("relationship", "") if st.session_state.get("survey_for") == "Someone Else" else ""
+                ]
+            })
+
+            # Optional spacing row
+            blank_row = pd.DataFrame([['', '']], columns=['Field', 'Value'])
+
+            # Combine metadata + survey results
+            meta_and_scores = pd.concat([meta_info, blank_row], ignore_index=True)
+
+            # Combine original df with new section
+            df_combined = pd.concat([df, blank_row, dimension_df, blank_row, leadership_df, blank_row, meta_and_scores], ignore_index=True)
+
+            # st.write("Work country selected 3:", country_work)
+            # st.write("Birth country selected 3:", birth_country)
+
+    
+            # Clean name for filename
+            # Collect contextual inputs
+            participant_role = st.session_state.get("job_function", "a professional")
+            participant_industry = st.session_state.get("industry", "their industry")
+            # country_work = st.session_state.get("country_work", "their country of work")
+            # birth_country = st.session_state.get("birth_country", "their country of origin")
+            country_work = get_country("country_work"),
+            birth_country = get_country("birth_country"),
+            email = get_email("email")
+
+            participant_name = st.session_state.get("name", "anonymous")
+            clean_name = re.sub(r'\W+', '_', participant_name.strip())
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"caliber_survey_{clean_name}_{timestamp}.csv"
+
+            df_combined.to_csv(filename, index=False)
+
             # Combine
             combined_df = pd.concat([existing_df, df_combined], ignore_index=True)
 
             # Write back full sheet
             set_with_dataframe(sheet, combined_df)
 
-            st.success("✅ Thank you for providing your assessment. The results have been saved.")
-            st.markdown("You may now close this window or return to the home page.")
-            st.stop()  # Stop further execution (no report generation)
-        
-        else:
-            with st.spinner("Creating your personalized leadership report..."):
+
+            # If survey was for someone else, skip the rest
+            if st.session_state.get("survey_for") == "Someone Else":
+                # csv_drive_id = upload_to_drive(filename, filename, "text/csv", folder_id)
+                # Combine
+                combined_df = pd.concat([existing_df, df_combined], ignore_index=True)
+
+                # Write back full sheet
+                set_with_dataframe(sheet, combined_df)
+
+                st.success("✅ Thank you for providing your assessment. The results have been saved.")
+                st.markdown("You may now close this window or return to the home page.")
+                st.stop()  # Stop further execution (no report generation)
+            
+            else:
+
 
                 import streamlit as st
                 from PIL import Image
