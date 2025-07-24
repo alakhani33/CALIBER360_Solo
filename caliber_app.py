@@ -607,830 +607,833 @@ if st.session_state.page == max_page:
                 st.success("✅ Thank you for providing your assessment. The results have been saved.")
                 st.markdown("You may now close this window or return to the home page.")
                 st.stop()  # Stop further execution (no report generation)
-
-
-            import streamlit as st
-            from PIL import Image
-
-            # Determine leadership level from score
-            score_pct = leadership_custom_scores['Overall Leadership PCT'] * 100
-            if score_pct <= 33.33:
-                level = "Aspiring Leader"
-            elif score_pct <= 66.66:
-                level = "Developing Leader"
-            else:
-                level = "Performing Leader"
-
-
             
-    
-            import matplotlib.pyplot as plt
-            import seaborn as sns
-            import os
+            else:
 
-            # === Generate and Save Bar Chart ===
-            # === Create and Save Hofstede Chart First ===
-            hofstede_keys = [
-                "High Uncertainty Avoidance PCT",
-                "High Individualism PCT",
-                "High Power Distance PCT",
-                "Long-Term Orientation PCT",
-                "High Masculinity PCT"
-            ]
 
-            hofstede_scores = [dimension_custom_scores[k] * 100 for k in hofstede_keys]
-            hofstede_labels = [
-                "Uncertainty Avoidance",
-                "Individualism",
-                "Power Distance",
-                "Long-Term Orientation",
-                "Masculinity"
-            ]
+                import streamlit as st
+                from PIL import Image
 
-            fig, ax = plt.subplots(figsize=(10, 5))
-            sns.barplot(x=hofstede_scores, y=hofstede_labels, palette="Blues_d", ax=ax)
-            ax.set_xlim(0, 100)
-            ax.set_title("Cultural Dimensions Profile (Hofstede)")
-            ax.set_xlabel("Score")
-            ax.set_ylabel("")
-            sns.despine()
+                # Determine leadership level from score
+                score_pct = leadership_custom_scores['Overall Leadership PCT'] * 100
+                if score_pct <= 33.33:
+                    level = "Aspiring Leader"
+                elif score_pct <= 66.66:
+                    level = "Developing Leader"
+                else:
+                    level = "Performing Leader"
 
-            hofstede_path = f"hofstede_chart_{clean_name}_{timestamp}.png"
-            fig.tight_layout()
-            fig.savefig(hofstede_path, dpi=150)
-            plt.close(fig)
 
-            import matplotlib.pyplot as plt
-            import seaborn as sns
+                
+        
+                import matplotlib.pyplot as plt
+                import seaborn as sns
+                import os
 
-            # Bar chart for leadership dimensions (Innovation vs Operations)
-            dimensions = [
-                "Communication PCT", "Vision PCT", "Authenticity PCT", "Empowerment PCT", "Creativity PCT",
-                "Stewardship PCT", "Competence PCT", "Confidence PCT", "Reinforcement PCT", "Culture PCT"
-            ]
+                # === Generate and Save Bar Chart ===
+                # === Create and Save Hofstede Chart First ===
+                hofstede_keys = [
+                    "High Uncertainty Avoidance PCT",
+                    "High Individualism PCT",
+                    "High Power Distance PCT",
+                    "Long-Term Orientation PCT",
+                    "High Masculinity PCT"
+                ]
 
-            scores = [
-                dimension_custom_scores[dim] * 100 for dim in dimensions
-            ]
+                hofstede_scores = [dimension_custom_scores[k] * 100 for k in hofstede_keys]
+                hofstede_labels = [
+                    "Uncertainty Avoidance",
+                    "Individualism",
+                    "Power Distance",
+                    "Long-Term Orientation",
+                    "Masculinity"
+                ]
 
-            labels = [
-                "Communication", "Vision", "Authenticity", "Empowerment", "Creativity",
-                "Stewardship", "Competence", "Confidence", "Reinforcement", "Culture"
-            ]
-
-            category = ["Innovation"] * 5 + ["Operations"] * 5
-            palette = sns.color_palette("Set2", 2)
-
-            fig, ax = plt.subplots(figsize=(10, 5))
-            sns.barplot(x=scores, y=labels, hue=category, dodge=False, palette=palette, ax=ax)
-            ax.set_title("Leadership Dimension Scores")
-            ax.set_xlim(0, 100)
-            ax.set_xlabel("Score")
-            ax.set_ylabel("")
-            sns.despine()
-
-            bar_chart_path = f"leadership_dimensions_{clean_name}_{timestamp}.png"
-            fig.tight_layout()
-            fig.savefig(bar_chart_path, dpi=150)
-            plt.close(fig)
-
-            def generate_overall_leadership_plot(score_pct, save_path):
-                fig, ax = plt.subplots(figsize=(10, 2))
-                ax.axhspan(0, 1, xmin=0.0, xmax=0.3333, facecolor='#ff9999', alpha=0.5)
-                ax.axhspan(0, 1, xmin=0.3333, xmax=0.6666, facecolor='#ffe066', alpha=0.5)
-                ax.axhspan(0, 1, xmin=0.6666, xmax=1.0, facecolor='#99ff99', alpha=0.5)
-
-                ax.axvline(score_pct, color='black', linewidth=3)
-                ax.text(10, 0.8, 'Aspiring Leader', fontsize=10, color='black')
-                ax.text(40, 0.8, 'Developing Leader', fontsize=10, color='black')
-                ax.text(75, 0.8, 'Performing Leader', fontsize=10, color='black')
-
-                ax.set_title('Overall Leadership Score', fontsize=14, weight='bold')
+                fig, ax = plt.subplots(figsize=(10, 5))
+                sns.barplot(x=hofstede_scores, y=hofstede_labels, palette="Blues_d", ax=ax)
                 ax.set_xlim(0, 100)
-                ax.set_yticks([])
-                ax.set_xlabel('Score')
-                sns.despine(left=True, bottom=True)
-                plt.tight_layout()
-                fig.savefig(save_path, dpi=150)
+                ax.set_title("Cultural Dimensions Profile (Hofstede)")
+                ax.set_xlabel("Score")
+                ax.set_ylabel("")
+                sns.despine()
+
+                hofstede_path = f"hofstede_chart_{clean_name}_{timestamp}.png"
+                fig.tight_layout()
+                fig.savefig(hofstede_path, dpi=150)
                 plt.close(fig)
 
-            score = leadership_custom_scores['Overall Leadership PCT'] * 100
-            sumplot_path = f"leadership_score_{clean_name}_{timestamp}.png"
-            generate_overall_leadership_plot(score, sumplot_path)
-            
-            from datetime import datetime
-
-            report_date = datetime.now().strftime("%B %d, %Y")
-            pdf_filename = f"leadership_summary_{clean_name}_{timestamp}.pdf"
-
-
-            # Define the interpretation task
-            # summary_description = ("""
-            # Please note: This is the first page of the CALIBER Leadership Inventory report. In addition to this expert analysis, the full report includes detailed scores, a national culture profile, and specific actions and development recommendations. Encourage the participant to carefully review the complete document.
-
-            # """ + 
-            #     f"Write a 1-page report for {participant_name} who works in {participant_industry} as {participant_role}. "
-            #     f"They scored {score_pct:.1f}/100 on the CALIBER Leadership Inventory. "
-            #     f"Label their leadership category as '{level}'. Reflect on the implications of this level of leadership capability "
-            #     f"on team performance and organizational culture within the context of {participant_industry}. Use positive, constructive tone. "
-            #     f"Also take into account that the participant currently works in {country_work} but was born in {birth_country}. "
-            #     f"Comment on how cultural dimensions might influence their leadership style and how cultural awareness can enhance their effectiveness. "
-            #     "Explain why leadership development is vital in their role and industry, and include a motivational call to action for growth." + f" Their leadership practices culturally align best with: {', '.join(closest_cultures)}."
-            # )
-
-#             summary_description = f"""
-# You are generating a personalized executive summary for a professional leadership report. DO NOT include fictional elements like the current date or salutations. DO NOT include the participant's name in a heading. 
-
-# Write a clear, well-organized executive summary (maximum 400 words) based on the following inputs:
-
-# - Participant Name: {participant_name}
-# - Industry: {participant_industry}
-# - Job Function: {participant_role}
-# - Leadership Score: {score_pct:.1f}/100
-# - Leadership Category: {level}
-# - Country of Work: {country_work}
-# - Country of Birth: {birth_country}
-
-
-# Instructions:
-# 1. Begin with a professional overview of the participant’s leadership score and category.  Use a personal tone.
-# 2. Reflect on what this level of capability means for their team and organizational culture in the context of their industry.
-# 3. Discuss how their cultural background (birth country vs work country) might influence their leadership style, based on Hofstede’s dimensions.
-# 4. Avoid headers like “Call to Action” or fake dates. Use a constructive, motivational, personal tone in paragraph format.
-# 5. Conclude with an uplifting statement encouraging leadership development.
-
-# Keep the entire response concise, insightful, and under 400 words.
-# """
-#             summary_description = f"""
-# You are generating an executive summary for a professional leadership report. Avoid fake elements like the current date or salutations. DO NOT include a header with the participant’s name or title. Instead, refer to the participant by name naturally within the body of the summary.  Speak to the participant directly.
-
-# Write a clear, well-organized executive summary (under 500 words) based on the following:
-
-# - Participant Name: {participant_name}
-# - Industry: {participant_industry}
-# - Job Function: {participant_role}
-# - Leadership Score: {score_pct:.1f}/100
-# - Leadership Category: {level}
-# - Country of Work: {country_work}
-# - Country of Birth: {birth_country}
-
-# Instructions:
-# 1. Begin by introducing {participant_name} and referencing their leadership score and category.
-# 2. Reflect on what this level of leadership means for their team and organizational culture in the context of their industry {participant_industry} and role {participant_role}.
-# 3. Include some current challenges for those playing the role of {participant_role} in this industry {participant_industry}.
-# 4. Discuss how being born in {birth_country} and working in {country_work} may influence {participant_name}'s leadership style, referencing Hofstede’s cultural dimensions.
-# 5. Use a constructive, professional tone in paragraph form.
-# 6. End with a motivational call to action encouraging leadership growth.
-
-# Avoid formal section titles like “Call to Action.” Write in paragraph format and keep it personal, supportive, and inspiring.  Fit within one page.
-# """
-
-            summary_description = f"""
-You are generating the **first-page executive summary** of a professional leadership development report for {participant_name}. The summary should feel insightful, credible, and encouraging — written in a voice that balances warmth with authority. Avoid artificial elements like the current date, salutations, or headings such as “Executive Summary.” Do not insert boilerplate content.
-
-### Participant Context:
-- Name: {participant_name}
-- Industry: {participant_industry}
-- Job Function: {participant_role}
-- Leadership Score: {score_pct:.1f}/100
-- Leadership Category: {level}
-- Country of Work: {country_work}
-- Country of Birth: {birth_country}
-
-### Writing Instructions:
-- Speak directly to {participant_name}, using second person ("you") throughout.
-- Open with a strong lead that introduces their leadership score and what it reflects about their style and potential.
-- Reflect on what this level of leadership means for team culture and strategic influence in the context of their specific industry ({participant_industry}) and role ({participant_role}).
-- Identify 1–2 challenges commonly faced by leaders in {participant_industry}, particularly in the role of {participant_role}, and tie these to {participant_name}'s leadership development opportunity.
-- Weave in cultural insight by interpreting the influence of being born in {birth_country} and now working in {country_work}, referencing Hofstede’s cultural dimensions without naming the model explicitly (e.g., refer to tendencies around hierarchy, individualism, or long-term thinking).
-- End with an empowering and specific call to action that motivates {participant_name} to build upon their strengths and navigate cross-cultural dynamics effectively.
-
-### Tone and Constraints:
-- Frame insights in the second person (e.g., “You may find…” or “You might experience…”) and avoid speaking **as** the participant. Instead, write from an expert coaching perspective, offering guidance with warmth, clarity, and respect.
-- Keep the tone reflective, personalized, constructive, and grounded in insight — not hype.
-- Avoid clichés, filler phrases, or superficial praise.
-- The content should read as if written by a seasoned executive coach or leadership strategist.
-- Total length: one well-structured page (under 500 words), in paragraph form with no titles or bullet points.
-"""          
-            
-            
-            
-#             summary_description = f"""
-# You are generating the **first-page executive summary** of a professional leadership development report for {participant_name}. The summary should feel insightful, credible, and encouraging — written in a voice that balances warmth with authority. Avoid artificial elements like the current date, salutations, or headings such as “Executive Summary.” Do not insert boilerplate content.
-
-# ### Participant Context:
-# - Name: {participant_name}
-# - Industry: {participant_industry}
-# - Job Function: {participant_role}
-# - Leadership Score: {score_pct:.1f}/100
-# - Leadership Category: {level}
-# - Country of Work: {country_work}
-# - Country of Birth: {birth_country}
-
-# ### Writing Instructions:
-# - Speak directly to {participant_name}, using second person ("you") throughout.
-# - Open with a strong lead that introduces their leadership score and what it reflects about their style and potential.
-# - Reflect on what this level of leadership means for team culture and strategic influence in the context of their specific industry ({participant_industry}) and role ({participant_role}).
-# - Identify 1–2 challenges commonly faced by leaders in {participant_industry}, particularly in the role of {participant_role}, and tie these to {participant_name}'s leadership development opportunity.
-# - Weave in cultural insight by interpreting the influence of being born in {birth_country} and now working in {country_work}, referencing Hofstede’s cultural dimensions without naming the model explicitly (e.g., refer to tendencies around hierarchy, individualism, or long-term thinking).
-# - End with an empowering and specific call to action that motivates {participant_name} to build upon their strengths and navigate cross-cultural dynamics effectively.
-
-# ### Tone and Constraints:
-# - Frame insights in the second person (e.g., “You may find…” or “You might experience…”) and avoid speaking **as** the participant. Instead, write from an expert coaching perspective, offering guidance with warmth, clarity, and respect.
-# - Keep the tone reflective, personalized, constructive, and grounded in insight — not hype.
-# - Avoid clichés, filler phrases, or superficial praise.
-# - The content should read as if written by a seasoned executive coach or leadership strategist.
-# - Total length: one well-structured page (under 500 words), in paragraph form with no titles or bullet points.
-# """
-
-
-
-            # Run the crew
-
-            
-            # summary_prompt = f"""
-            # Write a 1-page report for {participant_name} who works in {participant_industry} as {participant_role}.
-            # They scored {score_pct:.1f}/100 on the CALIBER Leadership Inventory.
-            # Label their leadership category as '{level}'.
-            # Reflect on implications for team performance and culture within the context of {participant_industry}.
-            # Include how being born in {birth_country} and working in {country_work} affects leadership style.
-            # Align analysis with Hofstede cultural dimensions: {', '.join(closest_cultures)}.
-            # Use the official CALIBER tone: positive, structured, and actionable.
-            # """
-            # result = llm.predict(summary_prompt)
-            result = llm.predict(summary_description)
-            # result = llm.invoke([HumanMessage(content=summary_description)])
-
-
-
-            # Compose interpretation task for dimensions
-
-            
-            # page2_prompt = f"""
-            # Write a summary interpreting the leadership scores in 10 dimensions.
-            # Separate discussion into Innovation (Communication, Vision, Authenticity, Empowerment, Creativity) and Operations (Stewardship, Competence, Confidence, Reinforcement, Culture).
-            # Explain the significance of each score, leadership potential, and team/organizational impact.
-            # Use CALIBER tone, structure, and style.
-            # """
-#             page2_prompt = f"""
-# You are writing a personalized interpretation of the participant’s leadership profile based on their scores across 10 dimensions.
-
-# Organize your response in two cohesive sections:
-# - **Innovation**: Communication, Vision, Authenticity, Empowerment, Creativity
-# - **Operations**: Stewardship, Competence, Confidence, Reinforcement, Culture
-
-# For each cluster:
-# 1. Interpret the participant’s scores, highlighting both strengths and opportunities.
-# 2. Discuss how these traits may manifest in their leadership behavior, influence team dynamics, and shape organizational outcomes.
-# 3. Use a warm, insightful, and empowering tone aligned with CALIBER's coaching style.
-
-# Avoid listing scores mechanically. Instead, weave them naturally into a narrative that reflects the participant’s potential and leadership journey.
-# """
-
-            # page2_prompt = f"""
-            # {participant_name}, let's take a closer look at your leadership profile. Reflect on your strengths and growth opportunities across two core areas: Innovation and Operations. Speak to the participant directly.
-
-            # - **Innovation** covers Communication, Vision, Authenticity, Empowerment, and Creativity.
-            # - **Operations** includes Stewardship, Competence, Confidence, Reinforcement, and Culture.
-
-            # Write two clear paragraphs — one for Innovation and one for Operations — highlighting standout scores and opportunities. Offer concrete suggestions for improvement and tie each insight to potential team or organizational impact. Use a confident, encouraging tone and address {participant_name} directly.  Fit within one page.
-            # """
-            page2_prompt = f"""
-            {participant_name}, let’s explore how your leadership profile expresses itself across two critical dimensions: **Innovation** and **Operations** — both of which are essential to effective leadership in your role as a {participant_role} within the {participant_industry} industry.
-
-            ### Innovation:
-            This domain includes Communication, Vision, Authenticity, Empowerment, and Creativity. In the context of your industry, where agility and forward-thinking often differentiate impactful leaders, highlight your highest strengths and any dimensions where further development could enhance innovation. Offer examples or strategies relevant to the {participant_industry} space that could help {participant_name} push boundaries, inspire teams, or drive transformational thinking.
-
-            ### Operations:
-            This includes Stewardship, Competence, Confidence, Reinforcement, and Culture. Address how {participant_name}'s current operational strengths align with the expectations and pressures of a {participant_role} in the {participant_industry} sector. Offer constructive suggestions to enhance consistency, clarity, and executional excellence — all framed in a way that connects individual growth with broader team or organizational outcomes.
-
-            Use a coaching tone that’s direct yet supportive. Speak to {participant_name} as a capable and evolving leader. Keep the writing clear and concise — structured as **two focused paragraphs** (one for Innovation, one for Operations), with practical insights and a sense of positive momentum. Fit all content on a single page, avoiding titles or bullet points.
-
-            ### Tone and Constraints:
-- Frame insights in the second person (e.g., “You may find…” or “You might experience…”) and avoid speaking **as** the participant. Instead, write from an expert coaching perspective, offering guidance with warmth, clarity, and respect.
-- Keep the tone reflective, personalized, constructive, and grounded in insight — not hype.
-- Avoid clichés, filler phrases, or superficial praise.
-- The content should read as if written by a seasoned executive coach or leadership strategist.
-- Total length: one well-structured page (under 500 words), in paragraph form with no titles or bullet points.
-            """
-            
-            
-#             page2_prompt = f"""
-#             {participant_name}, let’s explore how your leadership profile expresses itself across two critical dimensions: **Innovation** and **Operations** — both of which are essential to effective leadership in your role as a {participant_role} within the {participant_industry} industry.
-
-#             ### Innovation:
-#             This domain includes Communication, Vision, Authenticity, Empowerment, and Creativity. In the context of your industry, where agility and forward-thinking often differentiate impactful leaders, highlight your highest strengths and any dimensions where further development could enhance innovation. Offer examples or strategies relevant to the {participant_industry} space that could help {participant_name} push boundaries, inspire teams, or drive transformational thinking.
-
-#             ### Operations:
-#             This includes Stewardship, Competence, Confidence, Reinforcement, and Culture. Address how {participant_name}'s current operational strengths align with the expectations and pressures of a {participant_role} in the {participant_industry} sector. Offer constructive suggestions to enhance consistency, clarity, and executional excellence — all framed in a way that connects individual growth with broader team or organizational outcomes.
-
-#             Use a coaching tone that’s direct yet supportive. Speak to {participant_name} as a capable and evolving leader. Keep the writing clear and concise — structured as **two focused paragraphs** (one for Innovation, one for Operations), with practical insights and a sense of positive momentum. Fit all content on a single page, avoiding titles or bullet points.
-
-#             ### Tone and Constraints:
-# - Frame insights in the second person (e.g., “You may find…” or “You might experience…”) and avoid speaking **as** the participant. Instead, write from an expert coaching perspective, offering guidance with warmth, clarity, and respect.
-# - Keep the tone reflective, personalized, constructive, and grounded in insight — not hype.
-# - Avoid clichés, filler phrases, or superficial praise.
-# - The content should read as if written by a seasoned executive coach or leadership strategist.
-# - Total length: one well-structured page (under 500 words), in paragraph form with no titles or bullet points.
-#             """
-
-
-
-            page2_result = llm.predict(page2_prompt)
-            # page2_result = llm.invoke([HumanMessage(content=page2_prompt)])
-
-            # pdf.chapter_title("Interpretation of Innovation & Operations Dimensions")
-            # pdf.chapter_body(sanitize_text(page2_result))
-            # # pdf.add_image(bar_chart_path, "Leadership Dimension Breakdown")
-            # # Page 3 – National Culture Analysis
-            # pdf.add_page()
-            # pdf.chapter_title("Cultural Context and Implications")
-            
-            # culture_prompt = f"""
-            # Provide a concise analysis of how being born in {birth_country} but currently working in {country_work} might shape leadership expectations.
-            # Reference Hofstede’s dimensions.
-            # Include potential cultural tensions or synergies and leadership guidance.
-            # Use the official CALIBER tone and structure.
-            # """
-#             culture_prompt = f"""
-# Write a thoughtful reflection on how being born in {birth_country} and currently working in {country_work} may influence the participant’s leadership style.
-
-# Reference Hofstede’s cultural dimensions to explore how national values—such as attitudes toward hierarchy, uncertainty, or individualism—might shape expectations and behavior in the workplace.
-
-# Highlight potential cultural tensions or synergies the participant may encounter, and offer supportive, actionable guidance for leading effectively across these cultural dynamics.
-
-# Maintain a constructive, growth-focused tone consistent with CALIBER’s personalized coaching approach.
-# """
-
-            # culture_prompt = f"""
-            #     Explore how being born in {birth_country} and now working in {country_work} might shape {participant_name}’s leadership expectations and behaviors.
-
-            #     - Use Hofstede’s dimensions to interpret cultural contrasts.
-            #     - Highlight where {participant_name}'s cultural values may align or conflict with workplace expectations.
-            #     - Offer constructive guidance on how {participant_name} can adapt to thrive across cultural settings.
-
-            #     Write in the second person (e.g., “You may find...”) and maintain CALIBER's supportive and thoughtful tone.  Fit within one page.
-            #     """
-            culture_prompt = f"""
-{participant_name}, your leadership journey is shaped not only by your role and industry, but also by your cultural lens. Being born in {birth_country} and now working in {country_work} offers you a unique cross-cultural perspective that influences how you lead, communicate, and respond to organizational norms.
-
-Use this section to thoughtfully explore how cultural influences might shape your expectations and behaviors in the workplace. Consider how values formed in {birth_country} — such as attitudes toward hierarchy, uncertainty, collaboration, or long-term orientation — may align with or differ from the norms in {country_work}. Use Hofstede’s dimensions to guide your interpretation, but keep your insights conversational and accessible.
-
-Offer constructive, culturally aware guidance on how you can navigate these contrasts to become an even more adaptive and effective leader. Use second person language ("You may find...") and speak directly to {participant_name} with CALIBER’s trademark tone: personal, thoughtful, and empowering. Keep the reflection concise and impactful, fitting within a single page and written in paragraph form.
-
-### Tone and Constraints:
-- Frame insights in the second person (e.g., “You may find…” or “You might experience…”) and avoid speaking **as** the participant. Instead, write from an expert coaching perspective, offering guidance with warmth, clarity, and respect.
-- Keep the tone reflective, personalized, constructive, and grounded in insight — not hype.
-- Avoid clichés, filler phrases, or superficial praise.
-- The content should read as if written by a seasoned executive coach or leadership strategist.
-- Total length: one well-structured page (under 500 words), in paragraph form with no titles or bullet points.
-"""            
-            
-#             culture_prompt = f"""
-# {participant_name}, your leadership journey is shaped not only by your role and industry, but also by your cultural lens. Being born in {birth_country} and now working in {country_work} offers you a unique cross-cultural perspective that influences how you lead, communicate, and respond to organizational norms.
-
-# Use this section to thoughtfully explore how cultural influences might shape your expectations and behaviors in the workplace. Consider how values formed in {birth_country} — such as attitudes toward hierarchy, uncertainty, collaboration, or long-term orientation — may align with or differ from the norms in {country_work}. Use Hofstede’s dimensions to guide your interpretation, but keep your insights conversational and accessible.
-
-# Offer constructive, culturally aware guidance on how you can navigate these contrasts to become an even more adaptive and effective leader. Use second person language ("You may find...") and speak directly to {participant_name} with CALIBER’s trademark tone: personal, thoughtful, and empowering. Keep the reflection concise and impactful, fitting within a single page and written in paragraph form.
-
-# ### Tone and Constraints:
-# - Frame insights in the second person (e.g., “You may find…” or “You might experience…”) and avoid speaking **as** the participant. Instead, write from an expert coaching perspective, offering guidance with warmth, clarity, and respect.
-# - Keep the tone reflective, personalized, constructive, and grounded in insight — not hype.
-# - Avoid clichés, filler phrases, or superficial praise.
-# - The content should read as if written by a seasoned executive coach or leadership strategist.
-# - Total length: one well-structured page (under 500 words), in paragraph form with no titles or bullet points.
-# """
-
-
-
-            culture_result = llm.predict(culture_prompt)
-            # culture_result = llm.invoke([HumanMessage(content=culture_prompt)])
-
-            
-            # coach_prompt = f"""
-            # Write a structured and accessible development plan for {participant_name}.
-            # Suggest 3–5 growth areas across Innovation and Operations dimensions.
-            # Provide short rationale for each.
-            # Comment on Hofstede cultural scores and alignments: {', '.join(closest_cultures)}.
-            # Offer guidance for cross-cultural adaptability and leadership effectiveness.
-            # Use CALIBER tone and format.
-            # """
-#             coach_prompt = f"""
-# Develop a personalized leadership growth plan for {participant_name} based on their assessment results.
-
-# Identify 3 to 5 focused areas for development, drawing from both Innovation (e.g., Communication, Vision, Creativity) and Operations (e.g., Stewardship, Competence, Culture) dimensions. For each area, provide a brief rationale that highlights its significance for their role and leadership journey.
-
-# Incorporate insights from Hofstede’s cultural dimensions, especially as they relate to alignment with cultural profiles like {', '.join(closest_cultures)}. Reflect on how these cultural influences might support or challenge the participant's growth.
-
-# Conclude with clear, supportive guidance for cultivating cross-cultural leadership effectiveness. Maintain CALIBER’s tone: personalized, motivational, and forward-looking.
-# """
-
-            # coach_prompt = f"""
-            # Create a personalized leadership development plan for {participant_name}. Identify 3 to 5 growth areas across Innovation and Operations.  Fit within one page.
-
-            # For each:
-            # - Provide a short title (e.g., “Strategic Communication”) and a one-sentence rationale.
-            # - Give 1-2 practical steps {participant_name} can take to improve.
-            # - Briefly comment on how {', '.join(closest_cultures)} cultural patterns may influence leadership effectiveness.
-
-            # End with an inspiring message encouraging reflection, application, and follow-up. Write as if coaching {participant_name} directly.
-            # """
-            coach_prompt = f"""
-{participant_name}, based on your leadership profile, this page outlines a personalized development plan tailored to your role as a {participant_role} in the {participant_industry} industry. The goal is to help you grow as a leader in ways that align with the unique demands, pace, and culture of your professional environment.
-
-Identify **3 to 5 key growth areas** drawn from your Innovation and Operations scores — areas that matter most for someone in your position. For each:
-
-- Start with a short, descriptive title (e.g., “Strategic Communication”) and a one-sentence rationale that directly links the growth area to your responsibilities as a {participant_role} in {participant_industry}.
-- Offer 1–2 practical, real-world actions you can begin implementing — ideally in ways that create value for your team or organization.
-- Briefly reflect on how cultural patterns common in {', '.join(closest_cultures)} may impact how this skill is expressed or received, and suggest how you might navigate these dynamics effectively.
-Maintain a confident and constructive tone, as if coaching {participant_name} personally. End with a motivating message that encourages commitment to intentional practice and ongoing leadership growth. Keep everything to **one page**, in paragraph form — no headers or bullet points.
-### Tone and Constraints:
-- Frame insights in the second person (e.g., “You may find…” or “You might experience…”) and avoid speaking **as** the participant. Instead, write from an expert coaching perspective, offering guidance with warmth, clarity, and respect.
-- Keep the tone reflective, personalized, constructive, and grounded in insight — not hype.
-- Avoid clichés, filler phrases, or superficial praise.
-- The content should read as if written by a seasoned executive coach or leadership strategist.
-- Total length: one well-structured page (under 500 words), in paragraph form with no titles or bullet points.
-"""
-
-            
-            
-#             coach_prompt = f"""
-# {participant_name}, based on your leadership profile, this page outlines a personalized development plan tailored to your role as a {participant_role} in the {participant_industry} industry. The goal is to help you grow as a leader in ways that align with the unique demands, pace, and culture of your professional environment.
-
-# Identify **3 to 5 key growth areas** drawn from your Innovation and Operations scores — areas that matter most for someone in your position. For each:
-
-# - Start with a short, descriptive title (e.g., “Strategic Communication”) and a one-sentence rationale that directly links the growth area to your responsibilities as a {participant_role} in {participant_industry}.
-# - Offer 1–2 practical, real-world actions you can begin implementing — ideally in ways that create value for your team or organization.
-# - Briefly reflect on how cultural patterns common in {', '.join(closest_cultures)} may impact how this skill is expressed or received, and suggest how you might navigate these dynamics effectively.
-
-# Maintain a confident and constructive tone, as if coaching {participant_name} personally. End with a motivating message that encourages commitment to intentional practice and ongoing leadership growth. Keep everything to **one page**, in paragraph form — no headers or bullet points.
-# ### Tone and Constraints:
-# - Frame insights in the second person (e.g., “You may find…” or “You might experience…”) and avoid speaking **as** the participant. Instead, write from an expert coaching perspective, offering guidance with warmth, clarity, and respect.
-# - Keep the tone reflective, personalized, constructive, and grounded in insight — not hype.
-# - Avoid clichés, filler phrases, or superficial praise.
-# - The content should read as if written by a seasoned executive coach or leadership strategist.
-# - Total length: one well-structured page (under 500 words), in paragraph form with no titles or bullet points.
-# """
-
-
-
-            coach_result = llm.predict(coach_prompt)
-            # coach_result = llm.invoke([HumanMessage(content=coach_prompt)])
-
-            
-            # invite_prompt = """
-            # Write a 1-page summary introducing the CALIBER 360-degree leadership inventory.
-            # Explain how it exposes biases, highlights cultural fit, tracks progress, and improves self-awareness.
-            # Encourage multi-source feedback and close with an invitation to contact admin@caliberleadership.com.
-            # Use CALIBER style.
-            # """
-#             invite_prompt = """
-# Craft a one-page introduction to the CALIBER 360-Degree Leadership Inventory.
-
-# Begin by explaining the purpose of the tool: to offer a holistic perspective on leadership by gathering insights from self and others. Emphasize how the process increases self-awareness, uncovers potential biases, tracks leadership growth over time, and identifies cultural alignment.
-
-# Encourage participation from diverse feedback sources—peers, direct reports, and supervisors—to gain a balanced view of leadership strengths and opportunities.
-
-# Conclude with a warm, professional invitation to learn more by contacting admin@caliberleadership.com. Maintain the CALIBER style: clear, concise, and insight-driven.
-# """
-            # invite_prompt = """
-            # Introduce the CALIBER 360-Degree Leadership Inventory in a clear, engaging tone.  Fit within one page.
-
-            # - Explain its purpose: gathering feedback from peers, reports, and supervisors.
-            # - Highlight benefits: increased self-awareness, cultural alignment, bias reduction, and progress tracking.
-            # - Encourage participants to involve diverse raters and view feedback as a gift.
-            # - Close with an invitation to contact ali.lakhani@caliber360ai.com.  Make the contact email address stand out.
-
-            # Address the reader as “you” and maintain CALIBER’s warm, developmental tone.
-            # """
-            invite_prompt = f"""
-As a {participant_role} in the {participant_industry} industry, your leadership is constantly being shaped by how you engage with your team, peers, and organization. To build on the insights in this report, consider taking the next step: participating in the **CALIBER 360-Degree Leadership Inventory**.
-
-This powerful tool gathers confidential, structured feedback from those who work closely with you — including direct reports, peers, and supervisors. The purpose isn’t to evaluate your worth; it’s to help you see your leadership from multiple perspectives and identify actionable ways to grow in your specific professional context.
-
-For a leader in {participant_industry}, the CALIBER 360 offers unique benefits:
-- Greater self-awareness tied directly to how you lead in your {participant_role}
-- Insight into how your leadership aligns with cultural and organizational norms
-- A way to uncover blind spots and reduce personal bias
-- A meaningful method to track growth over time with input from others
-
-You're encouraged to invite a diverse set of raters who can speak to your leadership across different contexts. Feedback — even when surprising — is one of the most valuable tools you can receive. It provides the clarity needed to sharpen your influence and deepen your credibility.
-
-If you’re ready to lead with even more purpose and perspective, reach out to **ali.lakhani@caliber360ai.com** to begin your CALIBER 360. We’ll support you through every step with care, professionalism, and confidentiality.
-
-Your leadership journey is uniquely yours — and it doesn’t stop here.
-
-### Tone and Constraints:
-- Frame insights in the second person (e.g., “You may find…” or “You might experience…”) and avoid speaking **as** the participant. Instead, write from an expert coaching perspective, offering guidance with warmth, clarity, and respect.
-- Keep the tone reflective, personalized, constructive, and grounded in insight — not hype.
-- Avoid clichés, filler phrases, or superficial praise.
-- The content should read as if written by a seasoned executive coach or leadership strategist.
-- Total length: one well-structured page (under 500 words), in paragraph form with no titles or bullet points.
-"""
-            
-            
-            
-#             invite_prompt = f"""
-# As a {participant_role} in the {participant_industry} industry, your leadership is constantly being shaped by how you engage with your team, peers, and organization. To build on the insights in this report, consider taking the next step: participating in the **CALIBER 360-Degree Leadership Inventory**.
-
-# This powerful tool gathers confidential, structured feedback from those who work closely with you — including direct reports, peers, and supervisors. The purpose isn’t to evaluate your worth; it’s to help you see your leadership from multiple perspectives and identify actionable ways to grow in your specific professional context.
-
-# For a leader in {participant_industry}, the CALIBER 360 offers unique benefits:
-# - Greater self-awareness tied directly to how you lead in your {participant_role}
-# - Insight into how your leadership aligns with cultural and organizational norms
-# - A way to uncover blind spots and reduce personal bias
-# - A meaningful method to track growth over time with input from others
-
-# You're encouraged to invite a diverse set of raters who can speak to your leadership across different contexts. Feedback — even when surprising — is one of the most valuable tools you can receive. It provides the clarity needed to sharpen your influence and deepen your credibility.
-
-# If you’re ready to lead with even more purpose and perspective, reach out to **ali.lakhani@caliber360ai.com** to begin your CALIBER 360. We’ll support you through every step with care, professionalism, and confidentiality.
-
-# Your leadership journey is uniquely yours — and it doesn’t stop here.
-
-# Frame insights in the second person (e.g., “You may find…” or “You might experience…”) and avoid speaking **as** the participant. Instead, write from an expert coaching perspective, offering guidance with warmth, clarity, and respect.
-# """
-
-
-
-
-            invite_result = llm.predict(invite_prompt)
-            # invite_result = llm.invoke([HumanMessage(content=invite_prompt)])
-
-
-            section_dict = {
-                "Executive Summary": result,
-                "Interpretation of Innovation & Operations Dimensions": page2_result,
-                "Cultural Context and Implications": culture_result,
-                "Actionable Development Recommendations": coach_result,
-                "Invitation to 360-Degree CALIBER Assessment": invite_result
-            }
-
-
-            # def generate_caliber_report_with_cover(
-            #     output_path,
-            #     participant_name,
-            #     report_date,
-            #     sections_dict,
-            #     plot_path=None,
-            #     bar_chart_path=None,
-            #     hofstede_path=None
-            # ):
-            #     doc = SimpleDocTemplate(output_path, pagesize=LETTER,
-            #                             rightMargin=72, leftMargin=72,
-            #                             topMargin=72, bottomMargin=72)
-
-            #     styles = getSampleStyleSheet()
-            #     styles.add(ParagraphStyle(name="Heading", fontSize=14, leading=18, spaceAfter=12, spaceBefore=12, fontName="Helvetica-Bold"))
-            #     styles.add(ParagraphStyle(name="Body", fontSize=11, leading=14, spaceAfter=12))
-            #     styles.add(ParagraphStyle(name="CoverTitle", fontSize=24, leading=30, spaceAfter=24, alignment=1, fontName="Helvetica-Bold"))
-            #     styles.add(ParagraphStyle(name="CoverSub", fontSize=16, leading=20, spaceAfter=12, alignment=1))
-
-            #     story = []
-
-            #     # Cover page
-            #     story.append(Spacer(1, 2 * inch))
-            #     story.append(Paragraph("CALIBER Leadership Inventory", styles["CoverTitle"]))
-            #     story.append(Paragraph(participant_name, styles["CoverSub"]))
-            #     story.append(Paragraph(f"Report generated on {report_date}", styles["CoverSub"]))
-            #     story.append(PageBreak())
-
-            #     from reportlab.platypus import Image as RLImage
-
-            #     for section, content in sections_dict.items():
-            #         story.append(Paragraph(section, styles["Heading"]))
-            #         cleaned_content = clean_markdown(content.content)
-            #         story.append(Paragraph(cleaned_content, styles["Body"]))
-                    
-                    
-            #         # Optional image logic
-            #         # if "Overall Leadership Score" in section and sumplot_path and os.path.exists(sumplot_path):
-            #         if "Executive Summary" in section and sumplot_path and os.path.exists(sumplot_path):
-            #             story.append(Spacer(1, 0.1 * inch))
-            #             story.append(RLImage(sumplot_path, width=6.5*inch, height=1.8*inch))
-            #             story.append(Paragraph("Overall Leadership Score", styles["Body"]))
-            #             # story.append(PageBreak())
-            #         if "Innovation & Operations" in section and bar_chart_path and os.path.exists(bar_chart_path):
-            #             story.append(Spacer(1, 0.1 * inch))
-            #             story.append(RLImage(bar_chart_path, width=6.5*inch, height=3*inch))
-            #             story.append(Paragraph("Leadership Dimension Breakdown", styles["Body"]))
-            #             # story.append(PageBreak())
-            #         if "Cultural Context" in section and hofstede_path and os.path.exists(hofstede_path):
-            #             story.append(Spacer(1, 0.1 * inch))
-            #             story.append(RLImage(hofstede_path, width=6.5*inch, height=3*inch))
-            #             story.append(Paragraph("Cultural Dimensions Profile (Hofstede)", styles["Body"]))
-            #             # story.append(PageBreak())
-            #         story.append(Spacer(1, 0.3 * inch))
-
-            #     # template = PageTemplate(id='footer_template', frames=frame, onPage=add_footer)
-            #     # doc.addPageTemplates([template])
-            #     doc.build(story, onFirstPage=add_footer, onLaterPages=add_footer)
-
-            #     # doc.build(story)
-            #     return output_path
-
-            def generate_caliber_report_with_cover(
-                output_path,
-                participant_name,
-                report_date,
-                sections_dict,
-                plot_path=None,
-                bar_chart_path=None,
-                hofstede_path=None
-            ):
-                from reportlab.platypus import Image as RLImage
-
-                doc = SimpleDocTemplate(output_path, pagesize=LETTER,
-                                        rightMargin=72, leftMargin=72,
-                                        topMargin=72, bottomMargin=72)
-
-                styles = getSampleStyleSheet()
-                styles.add(ParagraphStyle(name="Heading", fontSize=14, leading=18, spaceAfter=12, spaceBefore=12, fontName="Helvetica-Bold"))
-                styles.add(ParagraphStyle(name="Body", fontSize=11, leading=14, spaceAfter=12))
-                styles.add(ParagraphStyle(name="CoverTitle", fontSize=24, leading=30, spaceAfter=24, alignment=1, fontName="Helvetica-Bold"))
-                styles.add(ParagraphStyle(name="CoverSub", fontSize=16, leading=20, spaceAfter=12, alignment=1))
-
-                story = []
-
-                # Cover page
-                story.append(Spacer(1, 2 * inch))
-                story.append(Paragraph("CALIBER Leadership Inventory", styles["CoverTitle"]))
-                story.append(Paragraph(participant_name, styles["CoverSub"]))
-                story.append(Paragraph(f"Report generated on {report_date}", styles["CoverSub"]))
-                story.append(PageBreak())
-
-                for section, content in sections_dict.items():
-                    story.append(Paragraph(section, styles["Heading"]))
-
-                    # Insert associated chart *before* the section content
-                    if "Executive Summary" in section and sumplot_path and os.path.exists(sumplot_path):
-                        story.append(Spacer(1, 0.1 * inch))
-                        story.append(RLImage(sumplot_path, width=6.5 * inch, height=1.8 * inch))
+                import matplotlib.pyplot as plt
+                import seaborn as sns
+
+                # Bar chart for leadership dimensions (Innovation vs Operations)
+                dimensions = [
+                    "Communication PCT", "Vision PCT", "Authenticity PCT", "Empowerment PCT", "Creativity PCT",
+                    "Stewardship PCT", "Competence PCT", "Confidence PCT", "Reinforcement PCT", "Culture PCT"
+                ]
+
+                scores = [
+                    dimension_custom_scores[dim] * 100 for dim in dimensions
+                ]
+
+                labels = [
+                    "Communication", "Vision", "Authenticity", "Empowerment", "Creativity",
+                    "Stewardship", "Competence", "Confidence", "Reinforcement", "Culture"
+                ]
+
+                category = ["Innovation"] * 5 + ["Operations"] * 5
+                palette = sns.color_palette("Set2", 2)
+
+                fig, ax = plt.subplots(figsize=(10, 5))
+                sns.barplot(x=scores, y=labels, hue=category, dodge=False, palette=palette, ax=ax)
+                ax.set_title("Leadership Dimension Scores")
+                ax.set_xlim(0, 100)
+                ax.set_xlabel("Score")
+                ax.set_ylabel("")
+                sns.despine()
+
+                bar_chart_path = f"leadership_dimensions_{clean_name}_{timestamp}.png"
+                fig.tight_layout()
+                fig.savefig(bar_chart_path, dpi=150)
+                plt.close(fig)
+
+                def generate_overall_leadership_plot(score_pct, save_path):
+                    fig, ax = plt.subplots(figsize=(10, 2))
+                    ax.axhspan(0, 1, xmin=0.0, xmax=0.3333, facecolor='#ff9999', alpha=0.5)
+                    ax.axhspan(0, 1, xmin=0.3333, xmax=0.6666, facecolor='#ffe066', alpha=0.5)
+                    ax.axhspan(0, 1, xmin=0.6666, xmax=1.0, facecolor='#99ff99', alpha=0.5)
+
+                    ax.axvline(score_pct, color='black', linewidth=3)
+                    ax.text(10, 0.8, 'Aspiring Leader', fontsize=10, color='black')
+                    ax.text(40, 0.8, 'Developing Leader', fontsize=10, color='black')
+                    ax.text(75, 0.8, 'Performing Leader', fontsize=10, color='black')
+
+                    ax.set_title('Overall Leadership Score', fontsize=14, weight='bold')
+                    ax.set_xlim(0, 100)
+                    ax.set_yticks([])
+                    ax.set_xlabel('Score')
+                    sns.despine(left=True, bottom=True)
+                    plt.tight_layout()
+                    fig.savefig(save_path, dpi=150)
+                    plt.close(fig)
+
+                score = leadership_custom_scores['Overall Leadership PCT'] * 100
+                sumplot_path = f"leadership_score_{clean_name}_{timestamp}.png"
+                generate_overall_leadership_plot(score, sumplot_path)
+                
+                from datetime import datetime
+
+                report_date = datetime.now().strftime("%B %d, %Y")
+                pdf_filename = f"leadership_summary_{clean_name}_{timestamp}.pdf"
+
+
+                # Define the interpretation task
+                # summary_description = ("""
+                # Please note: This is the first page of the CALIBER Leadership Inventory report. In addition to this expert analysis, the full report includes detailed scores, a national culture profile, and specific actions and development recommendations. Encourage the participant to carefully review the complete document.
+
+                # """ + 
+                #     f"Write a 1-page report for {participant_name} who works in {participant_industry} as {participant_role}. "
+                #     f"They scored {score_pct:.1f}/100 on the CALIBER Leadership Inventory. "
+                #     f"Label their leadership category as '{level}'. Reflect on the implications of this level of leadership capability "
+                #     f"on team performance and organizational culture within the context of {participant_industry}. Use positive, constructive tone. "
+                #     f"Also take into account that the participant currently works in {country_work} but was born in {birth_country}. "
+                #     f"Comment on how cultural dimensions might influence their leadership style and how cultural awareness can enhance their effectiveness. "
+                #     "Explain why leadership development is vital in their role and industry, and include a motivational call to action for growth." + f" Their leadership practices culturally align best with: {', '.join(closest_cultures)}."
+                # )
+
+    #             summary_description = f"""
+    # You are generating a personalized executive summary for a professional leadership report. DO NOT include fictional elements like the current date or salutations. DO NOT include the participant's name in a heading. 
+
+    # Write a clear, well-organized executive summary (maximum 400 words) based on the following inputs:
+
+    # - Participant Name: {participant_name}
+    # - Industry: {participant_industry}
+    # - Job Function: {participant_role}
+    # - Leadership Score: {score_pct:.1f}/100
+    # - Leadership Category: {level}
+    # - Country of Work: {country_work}
+    # - Country of Birth: {birth_country}
+
+
+    # Instructions:
+    # 1. Begin with a professional overview of the participant’s leadership score and category.  Use a personal tone.
+    # 2. Reflect on what this level of capability means for their team and organizational culture in the context of their industry.
+    # 3. Discuss how their cultural background (birth country vs work country) might influence their leadership style, based on Hofstede’s dimensions.
+    # 4. Avoid headers like “Call to Action” or fake dates. Use a constructive, motivational, personal tone in paragraph format.
+    # 5. Conclude with an uplifting statement encouraging leadership development.
+
+    # Keep the entire response concise, insightful, and under 400 words.
+    # """
+    #             summary_description = f"""
+    # You are generating an executive summary for a professional leadership report. Avoid fake elements like the current date or salutations. DO NOT include a header with the participant’s name or title. Instead, refer to the participant by name naturally within the body of the summary.  Speak to the participant directly.
+
+    # Write a clear, well-organized executive summary (under 500 words) based on the following:
+
+    # - Participant Name: {participant_name}
+    # - Industry: {participant_industry}
+    # - Job Function: {participant_role}
+    # - Leadership Score: {score_pct:.1f}/100
+    # - Leadership Category: {level}
+    # - Country of Work: {country_work}
+    # - Country of Birth: {birth_country}
+
+    # Instructions:
+    # 1. Begin by introducing {participant_name} and referencing their leadership score and category.
+    # 2. Reflect on what this level of leadership means for their team and organizational culture in the context of their industry {participant_industry} and role {participant_role}.
+    # 3. Include some current challenges for those playing the role of {participant_role} in this industry {participant_industry}.
+    # 4. Discuss how being born in {birth_country} and working in {country_work} may influence {participant_name}'s leadership style, referencing Hofstede’s cultural dimensions.
+    # 5. Use a constructive, professional tone in paragraph form.
+    # 6. End with a motivational call to action encouraging leadership growth.
+
+    # Avoid formal section titles like “Call to Action.” Write in paragraph format and keep it personal, supportive, and inspiring.  Fit within one page.
+    # """
+
+                summary_description = f"""
+    You are generating the **first-page executive summary** of a professional leadership development report for {participant_name}. The summary should feel insightful, credible, and encouraging — written in a voice that balances warmth with authority. Avoid artificial elements like the current date, salutations, or headings such as “Executive Summary.” Do not insert boilerplate content.
+
+    ### Participant Context:
+    - Name: {participant_name}
+    - Industry: {participant_industry}
+    - Job Function: {participant_role}
+    - Leadership Score: {score_pct:.1f}/100
+    - Leadership Category: {level}
+    - Country of Work: {country_work}
+    - Country of Birth: {birth_country}
+
+    ### Writing Instructions:
+    - Speak directly to {participant_name}, using second person ("you") throughout.
+    - Open with a strong lead that introduces their leadership score and what it reflects about their style and potential.
+    - Reflect on what this level of leadership means for team culture and strategic influence in the context of their specific industry ({participant_industry}) and role ({participant_role}).
+    - Identify 1–2 challenges commonly faced by leaders in {participant_industry}, particularly in the role of {participant_role}, and tie these to {participant_name}'s leadership development opportunity.
+    - Weave in cultural insight by interpreting the influence of being born in {birth_country} and now working in {country_work}, referencing Hofstede’s cultural dimensions without naming the model explicitly (e.g., refer to tendencies around hierarchy, individualism, or long-term thinking).
+    - End with an empowering and specific call to action that motivates {participant_name} to build upon their strengths and navigate cross-cultural dynamics effectively.
+
+    ### Tone and Constraints:
+    - Frame insights in the second person (e.g., “You may find…” or “You might experience…”) and avoid speaking **as** the participant. Instead, write from an expert coaching perspective, offering guidance with warmth, clarity, and respect.
+    - Keep the tone reflective, personalized, constructive, and grounded in insight — not hype.
+    - Avoid clichés, filler phrases, or superficial praise.
+    - The content should read as if written by a seasoned executive coach or leadership strategist.
+    - Total length: one well-structured page (under 500 words), in paragraph form with no titles or bullet points.
+    """          
+                
+                
+                
+    #             summary_description = f"""
+    # You are generating the **first-page executive summary** of a professional leadership development report for {participant_name}. The summary should feel insightful, credible, and encouraging — written in a voice that balances warmth with authority. Avoid artificial elements like the current date, salutations, or headings such as “Executive Summary.” Do not insert boilerplate content.
+
+    # ### Participant Context:
+    # - Name: {participant_name}
+    # - Industry: {participant_industry}
+    # - Job Function: {participant_role}
+    # - Leadership Score: {score_pct:.1f}/100
+    # - Leadership Category: {level}
+    # - Country of Work: {country_work}
+    # - Country of Birth: {birth_country}
+
+    # ### Writing Instructions:
+    # - Speak directly to {participant_name}, using second person ("you") throughout.
+    # - Open with a strong lead that introduces their leadership score and what it reflects about their style and potential.
+    # - Reflect on what this level of leadership means for team culture and strategic influence in the context of their specific industry ({participant_industry}) and role ({participant_role}).
+    # - Identify 1–2 challenges commonly faced by leaders in {participant_industry}, particularly in the role of {participant_role}, and tie these to {participant_name}'s leadership development opportunity.
+    # - Weave in cultural insight by interpreting the influence of being born in {birth_country} and now working in {country_work}, referencing Hofstede’s cultural dimensions without naming the model explicitly (e.g., refer to tendencies around hierarchy, individualism, or long-term thinking).
+    # - End with an empowering and specific call to action that motivates {participant_name} to build upon their strengths and navigate cross-cultural dynamics effectively.
+
+    # ### Tone and Constraints:
+    # - Frame insights in the second person (e.g., “You may find…” or “You might experience…”) and avoid speaking **as** the participant. Instead, write from an expert coaching perspective, offering guidance with warmth, clarity, and respect.
+    # - Keep the tone reflective, personalized, constructive, and grounded in insight — not hype.
+    # - Avoid clichés, filler phrases, or superficial praise.
+    # - The content should read as if written by a seasoned executive coach or leadership strategist.
+    # - Total length: one well-structured page (under 500 words), in paragraph form with no titles or bullet points.
+    # """
+
+
+
+                # Run the crew
+
+                
+                # summary_prompt = f"""
+                # Write a 1-page report for {participant_name} who works in {participant_industry} as {participant_role}.
+                # They scored {score_pct:.1f}/100 on the CALIBER Leadership Inventory.
+                # Label their leadership category as '{level}'.
+                # Reflect on implications for team performance and culture within the context of {participant_industry}.
+                # Include how being born in {birth_country} and working in {country_work} affects leadership style.
+                # Align analysis with Hofstede cultural dimensions: {', '.join(closest_cultures)}.
+                # Use the official CALIBER tone: positive, structured, and actionable.
+                # """
+                # result = llm.predict(summary_prompt)
+                result = llm.predict(summary_description)
+                # result = llm.invoke([HumanMessage(content=summary_description)])
+
+
+
+                # Compose interpretation task for dimensions
+
+                
+                # page2_prompt = f"""
+                # Write a summary interpreting the leadership scores in 10 dimensions.
+                # Separate discussion into Innovation (Communication, Vision, Authenticity, Empowerment, Creativity) and Operations (Stewardship, Competence, Confidence, Reinforcement, Culture).
+                # Explain the significance of each score, leadership potential, and team/organizational impact.
+                # Use CALIBER tone, structure, and style.
+                # """
+    #             page2_prompt = f"""
+    # You are writing a personalized interpretation of the participant’s leadership profile based on their scores across 10 dimensions.
+
+    # Organize your response in two cohesive sections:
+    # - **Innovation**: Communication, Vision, Authenticity, Empowerment, Creativity
+    # - **Operations**: Stewardship, Competence, Confidence, Reinforcement, Culture
+
+    # For each cluster:
+    # 1. Interpret the participant’s scores, highlighting both strengths and opportunities.
+    # 2. Discuss how these traits may manifest in their leadership behavior, influence team dynamics, and shape organizational outcomes.
+    # 3. Use a warm, insightful, and empowering tone aligned with CALIBER's coaching style.
+
+    # Avoid listing scores mechanically. Instead, weave them naturally into a narrative that reflects the participant’s potential and leadership journey.
+    # """
+
+                # page2_prompt = f"""
+                # {participant_name}, let's take a closer look at your leadership profile. Reflect on your strengths and growth opportunities across two core areas: Innovation and Operations. Speak to the participant directly.
+
+                # - **Innovation** covers Communication, Vision, Authenticity, Empowerment, and Creativity.
+                # - **Operations** includes Stewardship, Competence, Confidence, Reinforcement, and Culture.
+
+                # Write two clear paragraphs — one for Innovation and one for Operations — highlighting standout scores and opportunities. Offer concrete suggestions for improvement and tie each insight to potential team or organizational impact. Use a confident, encouraging tone and address {participant_name} directly.  Fit within one page.
+                # """
+                page2_prompt = f"""
+                {participant_name}, let’s explore how your leadership profile expresses itself across two critical dimensions: **Innovation** and **Operations** — both of which are essential to effective leadership in your role as a {participant_role} within the {participant_industry} industry.
+
+                ### Innovation:
+                This domain includes Communication, Vision, Authenticity, Empowerment, and Creativity. In the context of your industry, where agility and forward-thinking often differentiate impactful leaders, highlight your highest strengths and any dimensions where further development could enhance innovation. Offer examples or strategies relevant to the {participant_industry} space that could help {participant_name} push boundaries, inspire teams, or drive transformational thinking.
+
+                ### Operations:
+                This includes Stewardship, Competence, Confidence, Reinforcement, and Culture. Address how {participant_name}'s current operational strengths align with the expectations and pressures of a {participant_role} in the {participant_industry} sector. Offer constructive suggestions to enhance consistency, clarity, and executional excellence — all framed in a way that connects individual growth with broader team or organizational outcomes.
+
+                Use a coaching tone that’s direct yet supportive. Speak to {participant_name} as a capable and evolving leader. Keep the writing clear and concise — structured as **two focused paragraphs** (one for Innovation, one for Operations), with practical insights and a sense of positive momentum. Fit all content on a single page, avoiding titles or bullet points.
+
+                ### Tone and Constraints:
+    - Frame insights in the second person (e.g., “You may find…” or “You might experience…”) and avoid speaking **as** the participant. Instead, write from an expert coaching perspective, offering guidance with warmth, clarity, and respect.
+    - Keep the tone reflective, personalized, constructive, and grounded in insight — not hype.
+    - Avoid clichés, filler phrases, or superficial praise.
+    - The content should read as if written by a seasoned executive coach or leadership strategist.
+    - Total length: one well-structured page (under 500 words), in paragraph form with no titles or bullet points.
+                """
+                
+                
+    #             page2_prompt = f"""
+    #             {participant_name}, let’s explore how your leadership profile expresses itself across two critical dimensions: **Innovation** and **Operations** — both of which are essential to effective leadership in your role as a {participant_role} within the {participant_industry} industry.
+
+    #             ### Innovation:
+    #             This domain includes Communication, Vision, Authenticity, Empowerment, and Creativity. In the context of your industry, where agility and forward-thinking often differentiate impactful leaders, highlight your highest strengths and any dimensions where further development could enhance innovation. Offer examples or strategies relevant to the {participant_industry} space that could help {participant_name} push boundaries, inspire teams, or drive transformational thinking.
+
+    #             ### Operations:
+    #             This includes Stewardship, Competence, Confidence, Reinforcement, and Culture. Address how {participant_name}'s current operational strengths align with the expectations and pressures of a {participant_role} in the {participant_industry} sector. Offer constructive suggestions to enhance consistency, clarity, and executional excellence — all framed in a way that connects individual growth with broader team or organizational outcomes.
+
+    #             Use a coaching tone that’s direct yet supportive. Speak to {participant_name} as a capable and evolving leader. Keep the writing clear and concise — structured as **two focused paragraphs** (one for Innovation, one for Operations), with practical insights and a sense of positive momentum. Fit all content on a single page, avoiding titles or bullet points.
+
+    #             ### Tone and Constraints:
+    # - Frame insights in the second person (e.g., “You may find…” or “You might experience…”) and avoid speaking **as** the participant. Instead, write from an expert coaching perspective, offering guidance with warmth, clarity, and respect.
+    # - Keep the tone reflective, personalized, constructive, and grounded in insight — not hype.
+    # - Avoid clichés, filler phrases, or superficial praise.
+    # - The content should read as if written by a seasoned executive coach or leadership strategist.
+    # - Total length: one well-structured page (under 500 words), in paragraph form with no titles or bullet points.
+    #             """
+
+
+
+                page2_result = llm.predict(page2_prompt)
+                # page2_result = llm.invoke([HumanMessage(content=page2_prompt)])
+
+                # pdf.chapter_title("Interpretation of Innovation & Operations Dimensions")
+                # pdf.chapter_body(sanitize_text(page2_result))
+                # # pdf.add_image(bar_chart_path, "Leadership Dimension Breakdown")
+                # # Page 3 – National Culture Analysis
+                # pdf.add_page()
+                # pdf.chapter_title("Cultural Context and Implications")
+                
+                # culture_prompt = f"""
+                # Provide a concise analysis of how being born in {birth_country} but currently working in {country_work} might shape leadership expectations.
+                # Reference Hofstede’s dimensions.
+                # Include potential cultural tensions or synergies and leadership guidance.
+                # Use the official CALIBER tone and structure.
+                # """
+    #             culture_prompt = f"""
+    # Write a thoughtful reflection on how being born in {birth_country} and currently working in {country_work} may influence the participant’s leadership style.
+
+    # Reference Hofstede’s cultural dimensions to explore how national values—such as attitudes toward hierarchy, uncertainty, or individualism—might shape expectations and behavior in the workplace.
+
+    # Highlight potential cultural tensions or synergies the participant may encounter, and offer supportive, actionable guidance for leading effectively across these cultural dynamics.
+
+    # Maintain a constructive, growth-focused tone consistent with CALIBER’s personalized coaching approach.
+    # """
+
+                # culture_prompt = f"""
+                #     Explore how being born in {birth_country} and now working in {country_work} might shape {participant_name}’s leadership expectations and behaviors.
+
+                #     - Use Hofstede’s dimensions to interpret cultural contrasts.
+                #     - Highlight where {participant_name}'s cultural values may align or conflict with workplace expectations.
+                #     - Offer constructive guidance on how {participant_name} can adapt to thrive across cultural settings.
+
+                #     Write in the second person (e.g., “You may find...”) and maintain CALIBER's supportive and thoughtful tone.  Fit within one page.
+                #     """
+                culture_prompt = f"""
+    {participant_name}, your leadership journey is shaped not only by your role and industry, but also by your cultural lens. Being born in {birth_country} and now working in {country_work} offers you a unique cross-cultural perspective that influences how you lead, communicate, and respond to organizational norms.
+
+    Use this section to thoughtfully explore how cultural influences might shape your expectations and behaviors in the workplace. Consider how values formed in {birth_country} — such as attitudes toward hierarchy, uncertainty, collaboration, or long-term orientation — may align with or differ from the norms in {country_work}. Use Hofstede’s dimensions to guide your interpretation, but keep your insights conversational and accessible.
+
+    Offer constructive, culturally aware guidance on how you can navigate these contrasts to become an even more adaptive and effective leader. Use second person language ("You may find...") and speak directly to {participant_name} with CALIBER’s trademark tone: personal, thoughtful, and empowering. Keep the reflection concise and impactful, fitting within a single page and written in paragraph form.
+
+    ### Tone and Constraints:
+    - Frame insights in the second person (e.g., “You may find…” or “You might experience…”) and avoid speaking **as** the participant. Instead, write from an expert coaching perspective, offering guidance with warmth, clarity, and respect.
+    - Keep the tone reflective, personalized, constructive, and grounded in insight — not hype.
+    - Avoid clichés, filler phrases, or superficial praise.
+    - The content should read as if written by a seasoned executive coach or leadership strategist.
+    - Total length: one well-structured page (under 500 words), in paragraph form with no titles or bullet points.
+    """            
+                
+    #             culture_prompt = f"""
+    # {participant_name}, your leadership journey is shaped not only by your role and industry, but also by your cultural lens. Being born in {birth_country} and now working in {country_work} offers you a unique cross-cultural perspective that influences how you lead, communicate, and respond to organizational norms.
+
+    # Use this section to thoughtfully explore how cultural influences might shape your expectations and behaviors in the workplace. Consider how values formed in {birth_country} — such as attitudes toward hierarchy, uncertainty, collaboration, or long-term orientation — may align with or differ from the norms in {country_work}. Use Hofstede’s dimensions to guide your interpretation, but keep your insights conversational and accessible.
+
+    # Offer constructive, culturally aware guidance on how you can navigate these contrasts to become an even more adaptive and effective leader. Use second person language ("You may find...") and speak directly to {participant_name} with CALIBER’s trademark tone: personal, thoughtful, and empowering. Keep the reflection concise and impactful, fitting within a single page and written in paragraph form.
+
+    # ### Tone and Constraints:
+    # - Frame insights in the second person (e.g., “You may find…” or “You might experience…”) and avoid speaking **as** the participant. Instead, write from an expert coaching perspective, offering guidance with warmth, clarity, and respect.
+    # - Keep the tone reflective, personalized, constructive, and grounded in insight — not hype.
+    # - Avoid clichés, filler phrases, or superficial praise.
+    # - The content should read as if written by a seasoned executive coach or leadership strategist.
+    # - Total length: one well-structured page (under 500 words), in paragraph form with no titles or bullet points.
+    # """
+
+
+
+                culture_result = llm.predict(culture_prompt)
+                # culture_result = llm.invoke([HumanMessage(content=culture_prompt)])
+
+                
+                # coach_prompt = f"""
+                # Write a structured and accessible development plan for {participant_name}.
+                # Suggest 3–5 growth areas across Innovation and Operations dimensions.
+                # Provide short rationale for each.
+                # Comment on Hofstede cultural scores and alignments: {', '.join(closest_cultures)}.
+                # Offer guidance for cross-cultural adaptability and leadership effectiveness.
+                # Use CALIBER tone and format.
+                # """
+    #             coach_prompt = f"""
+    # Develop a personalized leadership growth plan for {participant_name} based on their assessment results.
+
+    # Identify 3 to 5 focused areas for development, drawing from both Innovation (e.g., Communication, Vision, Creativity) and Operations (e.g., Stewardship, Competence, Culture) dimensions. For each area, provide a brief rationale that highlights its significance for their role and leadership journey.
+
+    # Incorporate insights from Hofstede’s cultural dimensions, especially as they relate to alignment with cultural profiles like {', '.join(closest_cultures)}. Reflect on how these cultural influences might support or challenge the participant's growth.
+
+    # Conclude with clear, supportive guidance for cultivating cross-cultural leadership effectiveness. Maintain CALIBER’s tone: personalized, motivational, and forward-looking.
+    # """
+
+                # coach_prompt = f"""
+                # Create a personalized leadership development plan for {participant_name}. Identify 3 to 5 growth areas across Innovation and Operations.  Fit within one page.
+
+                # For each:
+                # - Provide a short title (e.g., “Strategic Communication”) and a one-sentence rationale.
+                # - Give 1-2 practical steps {participant_name} can take to improve.
+                # - Briefly comment on how {', '.join(closest_cultures)} cultural patterns may influence leadership effectiveness.
+
+                # End with an inspiring message encouraging reflection, application, and follow-up. Write as if coaching {participant_name} directly.
+                # """
+                coach_prompt = f"""
+    {participant_name}, based on your leadership profile, this page outlines a personalized development plan tailored to your role as a {participant_role} in the {participant_industry} industry. The goal is to help you grow as a leader in ways that align with the unique demands, pace, and culture of your professional environment.
+
+    Identify **3 to 5 key growth areas** drawn from your Innovation and Operations scores — areas that matter most for someone in your position. For each:
+
+    - Start with a short, descriptive title (e.g., “Strategic Communication”) and a one-sentence rationale that directly links the growth area to your responsibilities as a {participant_role} in {participant_industry}.
+    - Offer 1–2 practical, real-world actions you can begin implementing — ideally in ways that create value for your team or organization.
+    - Briefly reflect on how cultural patterns common in {', '.join(closest_cultures)} may impact how this skill is expressed or received, and suggest how you might navigate these dynamics effectively.
+    Maintain a confident and constructive tone, as if coaching {participant_name} personally. End with a motivating message that encourages commitment to intentional practice and ongoing leadership growth. Keep everything to **one page**, in paragraph form — no headers or bullet points.
+    ### Tone and Constraints:
+    - Frame insights in the second person (e.g., “You may find…” or “You might experience…”) and avoid speaking **as** the participant. Instead, write from an expert coaching perspective, offering guidance with warmth, clarity, and respect.
+    - Keep the tone reflective, personalized, constructive, and grounded in insight — not hype.
+    - Avoid clichés, filler phrases, or superficial praise.
+    - The content should read as if written by a seasoned executive coach or leadership strategist.
+    - Total length: one well-structured page (under 500 words), in paragraph form with no titles or bullet points.
+    """
+
+                
+                
+    #             coach_prompt = f"""
+    # {participant_name}, based on your leadership profile, this page outlines a personalized development plan tailored to your role as a {participant_role} in the {participant_industry} industry. The goal is to help you grow as a leader in ways that align with the unique demands, pace, and culture of your professional environment.
+
+    # Identify **3 to 5 key growth areas** drawn from your Innovation and Operations scores — areas that matter most for someone in your position. For each:
+
+    # - Start with a short, descriptive title (e.g., “Strategic Communication”) and a one-sentence rationale that directly links the growth area to your responsibilities as a {participant_role} in {participant_industry}.
+    # - Offer 1–2 practical, real-world actions you can begin implementing — ideally in ways that create value for your team or organization.
+    # - Briefly reflect on how cultural patterns common in {', '.join(closest_cultures)} may impact how this skill is expressed or received, and suggest how you might navigate these dynamics effectively.
+
+    # Maintain a confident and constructive tone, as if coaching {participant_name} personally. End with a motivating message that encourages commitment to intentional practice and ongoing leadership growth. Keep everything to **one page**, in paragraph form — no headers or bullet points.
+    # ### Tone and Constraints:
+    # - Frame insights in the second person (e.g., “You may find…” or “You might experience…”) and avoid speaking **as** the participant. Instead, write from an expert coaching perspective, offering guidance with warmth, clarity, and respect.
+    # - Keep the tone reflective, personalized, constructive, and grounded in insight — not hype.
+    # - Avoid clichés, filler phrases, or superficial praise.
+    # - The content should read as if written by a seasoned executive coach or leadership strategist.
+    # - Total length: one well-structured page (under 500 words), in paragraph form with no titles or bullet points.
+    # """
+
+
+
+                coach_result = llm.predict(coach_prompt)
+                # coach_result = llm.invoke([HumanMessage(content=coach_prompt)])
+
+                
+                # invite_prompt = """
+                # Write a 1-page summary introducing the CALIBER 360-degree leadership inventory.
+                # Explain how it exposes biases, highlights cultural fit, tracks progress, and improves self-awareness.
+                # Encourage multi-source feedback and close with an invitation to contact admin@caliberleadership.com.
+                # Use CALIBER style.
+                # """
+    #             invite_prompt = """
+    # Craft a one-page introduction to the CALIBER 360-Degree Leadership Inventory.
+
+    # Begin by explaining the purpose of the tool: to offer a holistic perspective on leadership by gathering insights from self and others. Emphasize how the process increases self-awareness, uncovers potential biases, tracks leadership growth over time, and identifies cultural alignment.
+
+    # Encourage participation from diverse feedback sources—peers, direct reports, and supervisors—to gain a balanced view of leadership strengths and opportunities.
+
+    # Conclude with a warm, professional invitation to learn more by contacting admin@caliberleadership.com. Maintain the CALIBER style: clear, concise, and insight-driven.
+    # """
+                # invite_prompt = """
+                # Introduce the CALIBER 360-Degree Leadership Inventory in a clear, engaging tone.  Fit within one page.
+
+                # - Explain its purpose: gathering feedback from peers, reports, and supervisors.
+                # - Highlight benefits: increased self-awareness, cultural alignment, bias reduction, and progress tracking.
+                # - Encourage participants to involve diverse raters and view feedback as a gift.
+                # - Close with an invitation to contact ali.lakhani@caliber360ai.com.  Make the contact email address stand out.
+
+                # Address the reader as “you” and maintain CALIBER’s warm, developmental tone.
+                # """
+                invite_prompt = f"""
+    As a {participant_role} in the {participant_industry} industry, your leadership is constantly being shaped by how you engage with your team, peers, and organization. To build on the insights in this report, consider taking the next step: participating in the **CALIBER 360-Degree Leadership Inventory**.
+
+    This powerful tool gathers confidential, structured feedback from those who work closely with you — including direct reports, peers, and supervisors. The purpose isn’t to evaluate your worth; it’s to help you see your leadership from multiple perspectives and identify actionable ways to grow in your specific professional context.
+
+    For a leader in {participant_industry}, the CALIBER 360 offers unique benefits:
+    - Greater self-awareness tied directly to how you lead in your {participant_role}
+    - Insight into how your leadership aligns with cultural and organizational norms
+    - A way to uncover blind spots and reduce personal bias
+    - A meaningful method to track growth over time with input from others
+
+    You're encouraged to invite a diverse set of raters who can speak to your leadership across different contexts. Feedback — even when surprising — is one of the most valuable tools you can receive. It provides the clarity needed to sharpen your influence and deepen your credibility.
+
+    If you’re ready to lead with even more purpose and perspective, reach out to **ali.lakhani@caliber360ai.com** to begin your CALIBER 360. We’ll support you through every step with care, professionalism, and confidentiality.
+
+    Your leadership journey is uniquely yours — and it doesn’t stop here.
+
+    ### Tone and Constraints:
+    - Frame insights in the second person (e.g., “You may find…” or “You might experience…”) and avoid speaking **as** the participant. Instead, write from an expert coaching perspective, offering guidance with warmth, clarity, and respect.
+    - Keep the tone reflective, personalized, constructive, and grounded in insight — not hype.
+    - Avoid clichés, filler phrases, or superficial praise.
+    - The content should read as if written by a seasoned executive coach or leadership strategist.
+    - Total length: one well-structured page (under 500 words), in paragraph form with no titles or bullet points.
+    """
+                
+                
+                
+    #             invite_prompt = f"""
+    # As a {participant_role} in the {participant_industry} industry, your leadership is constantly being shaped by how you engage with your team, peers, and organization. To build on the insights in this report, consider taking the next step: participating in the **CALIBER 360-Degree Leadership Inventory**.
+
+    # This powerful tool gathers confidential, structured feedback from those who work closely with you — including direct reports, peers, and supervisors. The purpose isn’t to evaluate your worth; it’s to help you see your leadership from multiple perspectives and identify actionable ways to grow in your specific professional context.
+
+    # For a leader in {participant_industry}, the CALIBER 360 offers unique benefits:
+    # - Greater self-awareness tied directly to how you lead in your {participant_role}
+    # - Insight into how your leadership aligns with cultural and organizational norms
+    # - A way to uncover blind spots and reduce personal bias
+    # - A meaningful method to track growth over time with input from others
+
+    # You're encouraged to invite a diverse set of raters who can speak to your leadership across different contexts. Feedback — even when surprising — is one of the most valuable tools you can receive. It provides the clarity needed to sharpen your influence and deepen your credibility.
+
+    # If you’re ready to lead with even more purpose and perspective, reach out to **ali.lakhani@caliber360ai.com** to begin your CALIBER 360. We’ll support you through every step with care, professionalism, and confidentiality.
+
+    # Your leadership journey is uniquely yours — and it doesn’t stop here.
+
+    # Frame insights in the second person (e.g., “You may find…” or “You might experience…”) and avoid speaking **as** the participant. Instead, write from an expert coaching perspective, offering guidance with warmth, clarity, and respect.
+    # """
+
+
+
+
+                invite_result = llm.predict(invite_prompt)
+                # invite_result = llm.invoke([HumanMessage(content=invite_prompt)])
+
+
+                section_dict = {
+                    "Executive Summary": result,
+                    "Interpretation of Innovation & Operations Dimensions": page2_result,
+                    "Cultural Context and Implications": culture_result,
+                    "Actionable Development Recommendations": coach_result,
+                    "Invitation to 360-Degree CALIBER Assessment": invite_result
+                }
+
+
+                # def generate_caliber_report_with_cover(
+                #     output_path,
+                #     participant_name,
+                #     report_date,
+                #     sections_dict,
+                #     plot_path=None,
+                #     bar_chart_path=None,
+                #     hofstede_path=None
+                # ):
+                #     doc = SimpleDocTemplate(output_path, pagesize=LETTER,
+                #                             rightMargin=72, leftMargin=72,
+                #                             topMargin=72, bottomMargin=72)
+
+                #     styles = getSampleStyleSheet()
+                #     styles.add(ParagraphStyle(name="Heading", fontSize=14, leading=18, spaceAfter=12, spaceBefore=12, fontName="Helvetica-Bold"))
+                #     styles.add(ParagraphStyle(name="Body", fontSize=11, leading=14, spaceAfter=12))
+                #     styles.add(ParagraphStyle(name="CoverTitle", fontSize=24, leading=30, spaceAfter=24, alignment=1, fontName="Helvetica-Bold"))
+                #     styles.add(ParagraphStyle(name="CoverSub", fontSize=16, leading=20, spaceAfter=12, alignment=1))
+
+                #     story = []
+
+                #     # Cover page
+                #     story.append(Spacer(1, 2 * inch))
+                #     story.append(Paragraph("CALIBER Leadership Inventory", styles["CoverTitle"]))
+                #     story.append(Paragraph(participant_name, styles["CoverSub"]))
+                #     story.append(Paragraph(f"Report generated on {report_date}", styles["CoverSub"]))
+                #     story.append(PageBreak())
+
+                #     from reportlab.platypus import Image as RLImage
+
+                #     for section, content in sections_dict.items():
+                #         story.append(Paragraph(section, styles["Heading"]))
+                #         cleaned_content = clean_markdown(content.content)
+                #         story.append(Paragraph(cleaned_content, styles["Body"]))
+                        
+                        
+                #         # Optional image logic
+                #         # if "Overall Leadership Score" in section and sumplot_path and os.path.exists(sumplot_path):
+                #         if "Executive Summary" in section and sumplot_path and os.path.exists(sumplot_path):
+                #             story.append(Spacer(1, 0.1 * inch))
+                #             story.append(RLImage(sumplot_path, width=6.5*inch, height=1.8*inch))
+                #             story.append(Paragraph("Overall Leadership Score", styles["Body"]))
+                #             # story.append(PageBreak())
+                #         if "Innovation & Operations" in section and bar_chart_path and os.path.exists(bar_chart_path):
+                #             story.append(Spacer(1, 0.1 * inch))
+                #             story.append(RLImage(bar_chart_path, width=6.5*inch, height=3*inch))
+                #             story.append(Paragraph("Leadership Dimension Breakdown", styles["Body"]))
+                #             # story.append(PageBreak())
+                #         if "Cultural Context" in section and hofstede_path and os.path.exists(hofstede_path):
+                #             story.append(Spacer(1, 0.1 * inch))
+                #             story.append(RLImage(hofstede_path, width=6.5*inch, height=3*inch))
+                #             story.append(Paragraph("Cultural Dimensions Profile (Hofstede)", styles["Body"]))
+                #             # story.append(PageBreak())
+                #         story.append(Spacer(1, 0.3 * inch))
+
+                #     # template = PageTemplate(id='footer_template', frames=frame, onPage=add_footer)
+                #     # doc.addPageTemplates([template])
+                #     doc.build(story, onFirstPage=add_footer, onLaterPages=add_footer)
+
+                #     # doc.build(story)
+                #     return output_path
+
+                def generate_caliber_report_with_cover(
+                    output_path,
+                    participant_name,
+                    report_date,
+                    sections_dict,
+                    plot_path=None,
+                    bar_chart_path=None,
+                    hofstede_path=None
+                ):
+                    from reportlab.platypus import Image as RLImage
+
+                    doc = SimpleDocTemplate(output_path, pagesize=LETTER,
+                                            rightMargin=72, leftMargin=72,
+                                            topMargin=72, bottomMargin=72)
+
+                    styles = getSampleStyleSheet()
+                    styles.add(ParagraphStyle(name="Heading", fontSize=14, leading=18, spaceAfter=12, spaceBefore=12, fontName="Helvetica-Bold"))
+                    styles.add(ParagraphStyle(name="Body", fontSize=11, leading=14, spaceAfter=12))
+                    styles.add(ParagraphStyle(name="CoverTitle", fontSize=24, leading=30, spaceAfter=24, alignment=1, fontName="Helvetica-Bold"))
+                    styles.add(ParagraphStyle(name="CoverSub", fontSize=16, leading=20, spaceAfter=12, alignment=1))
+
+                    story = []
+
+                    # Cover page
+                    story.append(Spacer(1, 2 * inch))
+                    story.append(Paragraph("CALIBER Leadership Inventory", styles["CoverTitle"]))
+                    story.append(Paragraph(participant_name, styles["CoverSub"]))
+                    story.append(Paragraph(f"Report generated on {report_date}", styles["CoverSub"]))
+                    story.append(PageBreak())
+
+                    for section, content in sections_dict.items():
+                        story.append(Paragraph(section, styles["Heading"]))
+
+                        # Insert associated chart *before* the section content
+                        if "Executive Summary" in section and sumplot_path and os.path.exists(sumplot_path):
+                            story.append(Spacer(1, 0.1 * inch))
+                            story.append(RLImage(sumplot_path, width=6.5 * inch, height=1.8 * inch))
+                            story.append(Spacer(1, 0.2 * inch))
+                            story.append(Paragraph("Overall Leadership Score", styles["Body"]))
+
+                        if "Innovation & Operations" in section and bar_chart_path and os.path.exists(bar_chart_path):
+                            story.append(Spacer(1, 0.1 * inch))
+                            story.append(RLImage(bar_chart_path, width=6.5 * inch, height=3 * inch))
+                            story.append(Spacer(1, 0.2 * inch))
+                            story.append(Paragraph("Leadership Dimension Breakdown", styles["Body"]))
+
+                        if "Cultural Context" in section and hofstede_path and os.path.exists(hofstede_path):
+                            story.append(Spacer(1, 0.1 * inch))
+                            story.append(RLImage(hofstede_path, width=6.5 * inch, height=3 * inch))
+                            story.append(Spacer(1, 0.2 * inch))
+                            story.append(Paragraph("Cultural Dimensions Profile (Hofstede)", styles["Body"]))
+
+                        # Insert section content
+                        # cleaned_content = clean_markdown(content.content)
+                        cleaned_content = clean_markdown(content)
                         story.append(Spacer(1, 0.2 * inch))
-                        story.append(Paragraph("Overall Leadership Score", styles["Body"]))
+                        story.append(Paragraph(cleaned_content, styles["Body"]))
+                        story.append(Spacer(1, 0.3 * inch))
 
-                    if "Innovation & Operations" in section and bar_chart_path and os.path.exists(bar_chart_path):
-                        story.append(Spacer(1, 0.1 * inch))
-                        story.append(RLImage(bar_chart_path, width=6.5 * inch, height=3 * inch))
-                        story.append(Spacer(1, 0.2 * inch))
-                        story.append(Paragraph("Leadership Dimension Breakdown", styles["Body"]))
-
-                    if "Cultural Context" in section and hofstede_path and os.path.exists(hofstede_path):
-                        story.append(Spacer(1, 0.1 * inch))
-                        story.append(RLImage(hofstede_path, width=6.5 * inch, height=3 * inch))
-                        story.append(Spacer(1, 0.2 * inch))
-                        story.append(Paragraph("Cultural Dimensions Profile (Hofstede)", styles["Body"]))
-
-                    # Insert section content
-                    # cleaned_content = clean_markdown(content.content)
-                    cleaned_content = clean_markdown(content)
-                    story.append(Spacer(1, 0.2 * inch))
-                    story.append(Paragraph(cleaned_content, styles["Body"]))
-                    story.append(Spacer(1, 0.3 * inch))
-
-                doc.build(story, onFirstPage=add_footer, onLaterPages=add_footer)
-                return output_path
+                    doc.build(story, onFirstPage=add_footer, onLaterPages=add_footer)
+                    return output_path
 
 
-            generate_caliber_report_with_cover(
-                output_path=pdf_filename,
-                participant_name=participant_name,
-                report_date=report_date,
-                sections_dict=section_dict,
-                plot_path=sumplot_path,
-                bar_chart_path=bar_chart_path,
-                hofstede_path=hofstede_path
-            )
-
-
-
-            # pdf.output(pdf_filename)
-
-            # Display in Streamlit
-            with open(pdf_filename, "rb") as f:
-                st.download_button(
-                    label="📄 Download Full Leadership Report (PDF)",
-                    data=f,
-                    file_name=pdf_filename,
-                    mime="application/pdf"
+                generate_caliber_report_with_cover(
+                    output_path=pdf_filename,
+                    participant_name=participant_name,
+                    report_date=report_date,
+                    sections_dict=section_dict,
+                    plot_path=sumplot_path,
+                    bar_chart_path=bar_chart_path,
+                    hofstede_path=hofstede_path
                 )
 
-            # csv_drive_id = upload_to_drive(filename, filename, "text/csv", folder_id)
-            # pdf_drive_id = upload_to_drive(pdf_filename, pdf_filename, "application/pdf", "your-folder-id")
-
-            # pdf_id = upload_to_drive(pdf_filename, pdf_filename, "application/pdf", folder_id)
-            # if pdf_id:
-            #     st.success("✅ PDF uploaded to Drive!")
-            # else:
-            #     st.error("❌ PDF upload failed.")
-
-            # st.success("✅ Uploaded to Google Drive!")
-            # st.write(f"CSV File ID: {csv_drive_id}")
-            # st.write(f"PDF File ID: {pdf_drive_id}")
-
-            # try:
-            #     csv_drive_id = upload_to_drive(filename, filename, "text/csv", folder_id)
-            #     st.success(f"✅ CSV uploaded to Drive (File ID: {csv_drive_id})")
-            # except Exception as e:
-            #     st.error(f"❌ CSV upload failed: {e}")
-
-            # try:
-            #     pdf_drive_id = upload_to_drive(pdf_filename, pdf_filename, "application/pdf", folder_id)
-            #     st.success(f"✅ PDF uploaded to Drive (File ID: {pdf_drive_id})")
-            # except Exception as e:
-            #     st.error(f"❌ PDF upload failed: {e}")
-            
-            
-            # Show text result
-            
-            # st.markdown("**Note:** This is only the first page of your CALIBER Leadership Inventory report. It includes an overview of your leadership category, national cultural context, and key development themes. Be sure to review the full report for in-depth scores, your national culture profile, and specific actions and recommendations tailored to you.")
-
-            # st.write(result)
-
-#             # Display top 5 aligned countries
-#             st.subheader("🌍 Best Cultural Matches")
-#             st.markdown("Your leadership style aligns most closely with these countries:")
-#             for country in closest_cultures:
-#                 st.markdown(f"- {country}")
-#  It includes an overview of your leadership category, national cultural context, and key development themes. Be sure to review the full report for in-depth scores, your national culture profile, and specific actions and recommendations tailored to you.")
-
-#             st.write(result)
-
-            # st.write(result)
-
-            # Display top 5 aligned countries
-            # st.subheader("🌍 Best Cultural Matches")
-            # st.markdown("Your leadership style aligns most closely with these countries:")
-            # for country in closest_cultures:
-            #     st.markdown(f"- {country}")
 
 
-            # # Display bar chart for dimension breakdown
-            # try:
-            #     bar_image = Image.open(bar_chart_path)
-            #     # st.image(bar_image, caption="Dimension Breakdown (Innovation vs Operations)", use_column_width=True)
-            # except Exception as e:
-            #     # st.warning(f"Could not load bar chart image: {e}")
+                # pdf.output(pdf_filename)
 
-            # === Display Hofstede Cultural Dimension Chart ===
-            # Create and display chart from dimension_custom_scores (Hofstede)
-            # hofstede_keys = [
-            #     "High Uncertainty Avoidance PCT",
-            #     "High Individualism PCT",
-            #     "High Power Distance PCT",
-            #     "Long-Term Orientation PCT",
-            #     "High Masculinity PCT"
-            # ]
+                # Display in Streamlit
+                with open(pdf_filename, "rb") as f:
+                    st.download_button(
+                        label="📄 Download Full Leadership Report (PDF)",
+                        data=f,
+                        file_name=pdf_filename,
+                        mime="application/pdf"
+                    )
 
-            # hofstede_scores = [dimension_custom_scores[k] * 100 for k in hofstede_keys]
-            # hofstede_labels = [
-            #     "Uncertainty Avoidance",
-            #     "Individualism",
-            #     "Power Distance",
-            #     "Long-Term Orientation",
-            #     "Masculinity"
-            # ]
+                # csv_drive_id = upload_to_drive(filename, filename, "text/csv", folder_id)
+                # pdf_drive_id = upload_to_drive(pdf_filename, pdf_filename, "application/pdf", "your-folder-id")
 
-            # fig, ax = plt.subplots(figsize=(10, 5))
-            # sns.barplot(x=hofstede_scores, y=hofstede_labels, palette="Blues_d", ax=ax)
-            # ax.set_xlim(0, 100)
-            # ax.set_title("Cultural Dimensions Profile (Hofstede)")
-            # ax.set_xlabel("Score")
-            # ax.set_ylabel("")
-            # sns.despine()
+                # pdf_id = upload_to_drive(pdf_filename, pdf_filename, "application/pdf", folder_id)
+                # if pdf_id:
+                #     st.success("✅ PDF uploaded to Drive!")
+                # else:
+                #     st.error("❌ PDF upload failed.")
 
-            # hofstede_path = f"hofstede_chart_{clean_name}_{timestamp}.png"
-            # fig.tight_layout()
-            # fig.savefig(hofstede_path, dpi=150)
-            # plt.close(fig)
+                # st.success("✅ Uploaded to Google Drive!")
+                # st.write(f"CSV File ID: {csv_drive_id}")
+                # st.write(f"PDF File ID: {pdf_drive_id}")
 
-            # try:
-            #     # hofstede_img = Image.open(hofstede_path)
-            #     # st.image(hofstede_img, caption="Cultural Dimensions Profile (Hofstede)", use_column_width=True)
-            # except Exception as e:
-            #     # st.warning(f"Could not load Hofstede chart image: {e}")
+                # try:
+                #     csv_drive_id = upload_to_drive(filename, filename, "text/csv", folder_id)
+                #     st.success(f"✅ CSV uploaded to Drive (File ID: {csv_drive_id})")
+                # except Exception as e:
+                #     st.error(f"❌ CSV upload failed: {e}")
 
-            # Display Crew-generated content from page 2–4
-            # st.subheader("📊 Interpretation of Innovation & Operations Dimensions")
-            # st.write(page2_result)
+                # try:
+                #     pdf_drive_id = upload_to_drive(pdf_filename, pdf_filename, "application/pdf", folder_id)
+                #     st.success(f"✅ PDF uploaded to Drive (File ID: {pdf_drive_id})")
+                # except Exception as e:
+                #     st.error(f"❌ PDF upload failed: {e}")
+                
+                
+                # Show text result
+                
+                # st.markdown("**Note:** This is only the first page of your CALIBER Leadership Inventory report. It includes an overview of your leadership category, national cultural context, and key development themes. Be sure to review the full report for in-depth scores, your national culture profile, and specific actions and recommendations tailored to you.")
 
-            # st.subheader("🌍 Cultural Context and Implications")
-            # # st.write(culture_result)
+                # st.write(result)
 
-            # st.subheader("🎯 Actionable Development Recommendations")
-            # # st.write(coach_result)
+    #             # Display top 5 aligned countries
+    #             st.subheader("🌍 Best Cultural Matches")
+    #             st.markdown("Your leadership style aligns most closely with these countries:")
+    #             for country in closest_cultures:
+    #                 st.markdown(f"- {country}")
+    #  It includes an overview of your leadership category, national cultural context, and key development themes. Be sure to review the full report for in-depth scores, your national culture profile, and specific actions and recommendations tailored to you.")
 
-            # report_filename = f"leadership_report_{clean_name}_{timestamp}.txt"
-            # with open(report_filename, "w", encoding="utf-8") as f:
-            #     f.write(result)
+    #             st.write(result)
 
-            # with open(pdf_filename, "rb") as f:
-            #     st.markdown("<div style='text-align: center; font-size: 0.8em; color: gray; margin-top: 2rem;'>© 2025 M.A. Lakhani. All rights reserved.</div>", unsafe_allow_html=True)
+                # st.write(result)
 
-            # with open(pdf_filename, "rb") as f:
-            #     st.download_button(
-            #         label="📄 Download Leadership Report (PDF)",
-            #         data=f,  # ✅ this was missing
-            #         file_name=pdf_filename,
-            #         mime="application/pdf"
-            #     )
+                # Display top 5 aligned countries
+                # st.subheader("🌍 Best Cultural Matches")
+                # st.markdown("Your leadership style aligns most closely with these countries:")
+                # for country in closest_cultures:
+                #     st.markdown(f"- {country}")
 
+
+                # # Display bar chart for dimension breakdown
+                # try:
+                #     bar_image = Image.open(bar_chart_path)
+                #     # st.image(bar_image, caption="Dimension Breakdown (Innovation vs Operations)", use_column_width=True)
+                # except Exception as e:
+                #     # st.warning(f"Could not load bar chart image: {e}")
+
+                # === Display Hofstede Cultural Dimension Chart ===
+                # Create and display chart from dimension_custom_scores (Hofstede)
+                # hofstede_keys = [
+                #     "High Uncertainty Avoidance PCT",
+                #     "High Individualism PCT",
+                #     "High Power Distance PCT",
+                #     "Long-Term Orientation PCT",
+                #     "High Masculinity PCT"
+                # ]
+
+                # hofstede_scores = [dimension_custom_scores[k] * 100 for k in hofstede_keys]
+                # hofstede_labels = [
+                #     "Uncertainty Avoidance",
+                #     "Individualism",
+                #     "Power Distance",
+                #     "Long-Term Orientation",
+                #     "Masculinity"
+                # ]
+
+                # fig, ax = plt.subplots(figsize=(10, 5))
+                # sns.barplot(x=hofstede_scores, y=hofstede_labels, palette="Blues_d", ax=ax)
+                # ax.set_xlim(0, 100)
+                # ax.set_title("Cultural Dimensions Profile (Hofstede)")
+                # ax.set_xlabel("Score")
+                # ax.set_ylabel("")
+                # sns.despine()
+
+                # hofstede_path = f"hofstede_chart_{clean_name}_{timestamp}.png"
+                # fig.tight_layout()
+                # fig.savefig(hofstede_path, dpi=150)
+                # plt.close(fig)
+
+                # try:
+                #     # hofstede_img = Image.open(hofstede_path)
+                #     # st.image(hofstede_img, caption="Cultural Dimensions Profile (Hofstede)", use_column_width=True)
+                # except Exception as e:
+                #     # st.warning(f"Could not load Hofstede chart image: {e}")
+
+                # Display Crew-generated content from page 2–4
+                # st.subheader("📊 Interpretation of Innovation & Operations Dimensions")
+                # st.write(page2_result)
+
+                # st.subheader("🌍 Cultural Context and Implications")
+                # # st.write(culture_result)
+
+                # st.subheader("🎯 Actionable Development Recommendations")
+                # # st.write(coach_result)
+
+                # report_filename = f"leadership_report_{clean_name}_{timestamp}.txt"
+                # with open(report_filename, "w", encoding="utf-8") as f:
+                #     f.write(result)
+
+                # with open(pdf_filename, "rb") as f:
+                #     st.markdown("<div style='text-align: center; font-size: 0.8em; color: gray; margin-top: 2rem;'>© 2025 M.A. Lakhani. All rights reserved.</div>", unsafe_allow_html=True)
+
+                # with open(pdf_filename, "rb") as f:
+                #     st.download_button(
+                #         label="📄 Download Leadership Report (PDF)",
+                #         data=f,  # ✅ this was missing
+                #         file_name=pdf_filename,
+                #         mime="application/pdf"
+                #     )
+
+                
